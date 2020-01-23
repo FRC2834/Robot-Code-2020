@@ -16,26 +16,41 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public interface Constants {
-    // Drive Motor Controller IDs
+    // Drive motor controller IDs
     public static int leftFrontID = 0;
     public static int leftBackID = 1;
     public static int rightFrontID = 2;
     public static int rightBackID = 3;
 
-    // Shooter Motor IDs
-    public static int shooterID0 = 4;
-    public static int shooterID1 = 5;
-    public static int shooterID2 = 6;
-    public static int shooterID3 = 7;
+    // Shooter motor IDs
+    // public static int shooterID0 = 4;
+    // public static int shooterID1 = 5;
+    // public static int shooterID2 = 6;
+    // public static int shooterID3 = 7;
+    public static int shooterID0 = 1;
+    public static int shooterID1 = 2;
+    public static int shooterID2 = 3;
+    public static int shooterID3 = 4;
     
-    // Hood Motor ID
+    // Hood motor ID
     public static int hoodID = 8;
 
-    // Turret Motor ID
+    // Turret motor ID
     public static int turretID = 9;
 
-    // Ball Manager ID(s)
+    // Ball manager ID(s)
     
-    // Intake Motor ID
+    // Intake motor ID
+
+    // Shooter motor config constants
+    public static int shooterNominal = 0;
+    public static int shooterPeakF = 1;
+    public static int shooterPeakR = -1;
+    public static int shooterPIDSlot = 0;
+    public static int shooterkF = 0;
+    public static int shooterkP = 0;
+    public static int shooterkI = 0;
+    public static int shooterkD = 0;
+
 
 }
