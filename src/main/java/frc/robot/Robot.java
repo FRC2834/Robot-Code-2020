@@ -98,7 +98,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    //m_robotContainer.shooter.shooterMotor.set(ControlMode.PercentOutput, 0.5);
+
   }
 
   @Override

@@ -42,15 +42,38 @@ public interface Constants {
     
     // Intake motor ID
 
+    // General motor config constants
+    public static int motorNominal = 0;
+    public static int motorPeakF = 1;
+    public static int motorPeakR = -1;
+
     // Shooter motor config constants
-    public static int shooterNominal = 0;
-    public static int shooterPeakF = 1;
-    public static int shooterPeakR = -1;
-    public static int shooterPIDSlot = 0;
-    public static int shooterkF = 0;
-    public static int shooterkP = 0;
-    public static int shooterkI = 0;
-    public static int shooterkD = 0;
+    public static int shooterSlotIDx = 0;
+    public static int shooterPIDIDx = 0;
+    public static double shooterkF = 0.0;
+    public static double shooterkP = 0.0;
+    public static double shooterkI = 0.0;
+    public static double shooterkD = 0.0;
 
+    // Hood motor config constants
+    public static int hoodSlotIDx = 0;
+    public static int hoodPIDIDx = 0;
+    // public static double hoodkF = 0.0;
+    public static double hoodkP = 0.0;
+    public static double hoodkI = 0.0;
+    public static double hoodkD = 0.0;
 
+    // Turret motor config constants
+    public static int turretPeriod = 10;
+    public static int turretPIDIDx = 0;
+    public static int turretSlotIDx = 0;
+    public static double turretkF = 0.0;
+    public static double turretkP = 0.0;
+    public static double turretkI = 0.0;
+    public static double turretkD = 0.0;
+    public static int turretCruiseVelocity = 0;
+    public static int turretAcceleration = 0;
+
+    // Camera position constants
+    public static double cameraAngleOfElevationl = 0;
 }
