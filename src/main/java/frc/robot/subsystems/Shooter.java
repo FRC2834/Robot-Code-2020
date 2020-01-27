@@ -19,6 +19,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.MotionConstants;
 
 public class Shooter extends SubsystemBase {
 
@@ -256,13 +257,206 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Calculates the initial velocity of the ball required to shoot at into the target.
-   * @param tvec The translation vector relative to the center of the flywheel assembly in the order of x, y, and z.
+   * Calculates the translation from where the ball leaves the shooter relative to the center of the flyweel assembly.
    * @param hoodAngle The target angle of the hood in radians.
-   * @return The target velocity of the ball in meters per second.
+   * @param flywheelRadius The radius of the flywheel.
+   * @param ballRadius The radius of the ball.
+   * @return The translation from where the ball leaves the shooter relative to the center of the flyweel assembly.
    */
-  public double calculateInitialVelocity(double[] tvec, double hoodAngle) {
+  public double[] calculateHoodTranslation(double hoodAngle, double flywheelRadius, double ballRadius) {
+    // Get the y translation
+    double deltaY = (flywheelRadius+ballRadius) * Math.sin(hoodAngle);
+    // Get the z translation
+    double deltaZ = (flywheelRadius+ballRadius) * Math.cos(hoodAngle);
 
+    return new double[] {deltaY, deltaZ};
+  }
+
+  /**
+   * Calculates the ideal initial velocity of the ball required to shoot at into the target.
+   * @param tvec The translation vector at the point where the ball leaves the shooter in the order of x, y, and z.
+   * @param hoodAngle The target angle of the hood in radians.
+   * @param g Acceleration due to gravity in meters per second^2.
+   * @return The ideal initial velocity of the ball in meters per second.
+   */
+  public double calculateIdealInitialVelocity(double[] tvec, double hoodAngle, double g) {
+    // Get the necessary values from tvec
+    double y = tvec[1];
+    double z = tvec[2];
+    // Get the ideal initial velocity
+    double a = Math.pow(z, 2) * g;
+    double b = z * Math.sin(2 * hoodAngle) - 2 * y * Math.pow(Math.cos(hoodAngle), 2);
+    double idealInitialVelocity = Math.sqrt(a / b);
+
+    return idealInitialVelocity;
+  }
+
+  /**
+   * Calculates the intial velocity x and velocity y.
+   * @param initialVelocity The initial velocity of the ball in meters per second.
+   * @param hoodAngle The target angle of the hood in radians
+   * @return Initial velocity x and velocity y.
+   */
+  public double[] calculateInitialVxAndVy(double initialVelocity, double hoodAngle) {
+    // Get Vx and Vy
+    double InitVx = initialVelocity * Math.cos(hoodAngle);
+    double InitVy = initialVelocity * Math.sin(hoodAngle);
+
+    return new double[] {InitVx, InitVy};
+  }
+
+  /**
+   * Calculates the angular velocity of the ball
+   * @param initialVelocity The initial velocity of the ball in meters per second.
+   * @param ballRadius The radius of the ball.
+   * @return The angular velocity of the ball in radians per second.
+   */
+  public double calculateAngularVelocity(double initialVelocity, double ballRadius) {
+    // Get angular velocity
+    double tangentialVelocity = initialVelocity * 2;
+    double w = tangentialVelocity / ballRadius;
+
+    return w;
+  }
+
+  /**
+   * Calculates acceleration x and acceleration y.
+   * @param Cd The drag coefficient.
+   * @param Ks The proportionality constant.
+   * @param w Angular velocity in radians per second.
+   * @param p Density of medium in kg per meters^3.
+   * @param A Projected area in meters^2.
+   * @param m Mass of object in kg.
+   * @param g Acceleration due to gravity in meters per second^2.
+   * @param Vx Velocity x in meters per second.
+   * @param Vy Velocity y in meters per second.
+   * @return Acceleration x and acceleration y.
+   */
+  public double[] calculateAxAndAy(double Cd, double Ks, double w, double p, double A, double m, double g, double Vx, double Vy) {
+    // Calculate Ax and Ay
+    double Ax = -0.5 * Cd * p * A * Vx * Math.sqrt(Math.pow(Vx, 2) + Math.pow(Vy, 2)) * (1 / m) - Ks * w * Vy * (1 / m);
+    double Ay = -0.5 * Cd * p * A * Vy * Math.sqrt(Math.pow(Vx, 2) + Math.pow(Vy, 2)) * (1 / m) - g + Ks * w * Vx * (1 / m);
+
+    return new double[] {Ax, Ay};
+  }
+
+  /**
+   * 
+   * @param initAx Initial acceleration x.
+   * @param initAy Initial acceleration y.
+   * @param initVx Initial velocity x.
+   * @param initVy Initial velocity y.
+   * @param initX Initial x.
+   * @param initY Initial y.
+   * @param w Angular velocity in radians per second.
+   * @param t Timestep.
+   * @param distanceToTarget Distance to target in meters
+   * @param targetHeight Height of target in meters
+   * @param constants Constants for caluclating Ax and Ay.
+   * @return The height of the ball when it crosses the target plane.
+   */
+  public double calculateHeightAtTarget(double initAx, double initAy, double initVx, double initVy, double initX, double initY, double w, double t, double distanceToTarget, MotionConstants constants) {
+    // Get initial values
+    double[] currentAxAndAy = new double[] {initAx, initAy};
+    double currentVx = initVx;
+    double currentVy = initVy;
+    double currentX = initX;
+    double currentY = initY;
+
+    while(currentX < distanceToTarget) {
+      // Integrate over time
+      currentX = currentVx * t + currentX;
+      currentY = currentVy * t + currentY;
+      currentVx = currentAxAndAy[0] * t + currentVx;
+      currentVy = currentAxAndAy[1] * t + currentVy;
+      currentAxAndAy = calculateAxAndAy(constants.Cd, constants.Ks, w, constants.p, constants.A, constants.m, constants.g, currentVx, currentVy);
+    }
+
+    return currentY;
+  }
+
+  /**
+   * Calculates the velocity required to intercept the target.
+   * @param idealInitialVelocity The ideal initial velocity of the ball in meters per second.
+   * @param hoodAngle The angle of the hood in radians.
+   * @param ballRadius The radius of the ball in meters.
+   * @param constants The constants required for calculating accleration x and acceleration y.
+   * @param initY The initial y position of the ball (i.e. when it leaves the shooter).
+   * @param t The timestep in seconds.
+   * @param vStep The amount velocity is incremented in meters per second to find the velocity required to intercept the target.
+   * @param distanceToTarget The distance to the target in meters.
+   * @param targetHeight The height of the target in meters
+   * @return The velocity required to intercept the target in meters per second.
+   */
+  public double calculateCorrectedVelocity(double idealInitialVelocity, double hoodAngle, double ballRadius, MotionConstants constants, double initY, double t, double vStep, double distanceToTarget, double targetHeight) {
+    // Initial velocity to start checking with.
+    double initialVelocity = idealInitialVelocity;
+    // Get Vx and Vy
+    double[] VxAndVy = calculateInitialVxAndVy(initialVelocity, hoodAngle);
+    // Get w
+    double w = calculateAngularVelocity(initialVelocity, ballRadius);
+    // Get Ax and Ay
+    double[] AxAndAy = calculateAxAndAy(constants.Cd, constants.Ks, w, constants.p, constants.A, constants.m, constants.g, VxAndVy[0], VxAndVy[1]);
+    // Get height at target
+    double yAtTarget = calculateHeightAtTarget(AxAndAy[0], AxAndAy[1], VxAndVy[0], VxAndVy[1], 0, initY, w, t, distanceToTarget, constants);
+    // Search higher or lower velocity
+    if(yAtTarget > targetHeight) {
+      while(yAtTarget > targetHeight) {
+        // Increment initial velocity
+        initialVelocity -= vStep;
+        // Get Vx and Vy
+        VxAndVy = calculateInitialVxAndVy(initialVelocity, hoodAngle);
+        // Get w
+        w = calculateAngularVelocity(initialVelocity, ballRadius);
+        // Get Ax and Ay
+        AxAndAy = calculateAxAndAy(constants.Cd, constants.Ks, w, constants.p, constants.A, constants.m, constants.g, VxAndVy[0], VxAndVy[1]);
+        // Get height at target
+        yAtTarget = calculateHeightAtTarget(AxAndAy[0], AxAndAy[1], VxAndVy[0], VxAndVy[1], 0, initY, w, t, distanceToTarget, constants);
+      }
+    } else if(yAtTarget < targetHeight) {
+      while(yAtTarget < targetHeight) {
+        // Increment initial velocity
+        initialVelocity += vStep;
+        // Get Vx and Vy
+        VxAndVy = calculateInitialVxAndVy(initialVelocity, hoodAngle);
+        // Get w
+        w = calculateAngularVelocity(initialVelocity, ballRadius);
+        // Get Ax and Ay
+        AxAndAy = calculateAxAndAy(constants.Cd, constants.Ks, w, constants.p, constants.A, constants.m, constants.g, VxAndVy[0], VxAndVy[1]);
+        // Get height at target
+        yAtTarget = calculateHeightAtTarget(AxAndAy[0], AxAndAy[1], VxAndVy[0], VxAndVy[1], 0, initY, w, t, distanceToTarget, constants);
+      }
+    }
+
+    return initialVelocity;
+  }
+
+  /**
+   * Converts initial velocity of the ball to rotations per minute of the flywheel.
+   * @param initialVelocity Initial velocity of the ball in meters per second.
+   * @param flywheelRadius Radius of the flywheel in meters.
+   * @return The rotations per minute of the flywheel.
+   */
+  double initVToRPM(double initialVelocity, double flywheelRadius) {
+    // Get tangential velocity of the ball and shooter
+    double tangentialVelocity = initialVelocity * 2;
+    // Get the RPM of the flywheel
+    double RPM = tangentialVelocity / (2 * Math.PI * flywheelRadius) * 60;
+
+    return RPM;
+  }
+
+  /**
+   * Converts rotations per minute to encoder ticks per second.
+   * @param RPM Rotation per minute.
+   * @param ticksPerRevolution Encoder ticks per wheel revolution.
+   * @return Encoder ticks per second.
+   */
+  double RPMToTicksPerSecond(double RPM, double ticksPerRevolution) {
+    // Get the ticks per second
+    double ticksPerSecond = RPM / 60 * ticksPerRevolution;
+
+    return ticksPerSecond;
   }
 
   /**
