@@ -9,7 +9,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
@@ -25,13 +24,13 @@ public class Shooter extends SubsystemBase {
 
   // Declare shooter motors
   public TalonSRX shooterMotor;
-  private VictorSPX[] shooterFollowers;
+  public VictorSPX[] shooterFollowers;
 
   // Declare hood motor
-  private TalonSRX hoodMotor;
+  public TalonSRX hoodMotor;
 
   // Declare turret motor
-  private TalonSRX turretMotor;
+  public TalonSRX turretMotor;
 
   /**
    * Creates a new Shooter.
@@ -60,6 +59,7 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("turret encoder", turretMotor.getSelectedSensorPosition());
   }
 
   /**
@@ -72,8 +72,10 @@ public class Shooter extends SubsystemBase {
       motor.configFactoryDefault();
     }
     // Set followers
+    shooterMotor.set(ControlMode.Follower, 0);
     for(VictorSPX motor : shooterFollowers) {
       motor.follow(shooterMotor);
+      motor.set(ControlMode.Follower, 1);
     }
     // Set direction
     shooterMotor.setInverted(false);
@@ -88,13 +90,13 @@ public class Shooter extends SubsystemBase {
     shooterMotor.configNominalOutputForward(Constants.motorNominal);
     shooterMotor.configNominalOutputReverse(Constants.motorNominal);
     shooterMotor.configPeakOutputForward(Constants.motorPeakF);
-    shooterMotor.configPeakOutputForward(Constants.motorPeakR);
+    shooterMotor.configPeakOutputReverse(Constants.motorPeakR);
     shooterMotor.setNeutralMode(NeutralMode.Coast);
     for(VictorSPX motor : shooterFollowers) {
       motor.configNominalOutputForward(Constants.motorNominal);
       motor.configNominalOutputReverse(Constants.motorNominal);
       motor.configPeakOutputForward(Constants.motorPeakF);
-      motor.configPeakOutputForward(Constants.motorPeakR);
+      motor.configPeakOutputReverse(Constants.motorPeakR);
       motor.setNeutralMode(NeutralMode.Coast);
     }
     // Config velocity closed loop gains
@@ -116,14 +118,14 @@ public class Shooter extends SubsystemBase {
     hoodMotor.configNominalOutputForward(Constants.motorNominal);
     hoodMotor.configNominalOutputReverse(Constants.motorNominal);
     hoodMotor.configPeakOutputForward(Constants.motorPeakF);
-    hoodMotor.configPeakOutputForward(Constants.motorPeakR);
+    hoodMotor.configPeakOutputReverse(Constants.motorPeakR);
     hoodMotor.setNeutralMode(NeutralMode.Brake);
     // Config position closed loop gains
-    hoodMotor.selectProfileSlot(Constants.shooterSlotIDx, Constants.shooterPIDIDx);
-    hoodMotor.config_kF(Constants.shooterSlotIDx, Constants.shooterkF);
-    hoodMotor.config_kP(Constants.shooterSlotIDx, Constants.shooterkP);
-    hoodMotor.config_kI(Constants.shooterSlotIDx, Constants.shooterkI);
-    hoodMotor.config_kD(Constants.shooterSlotIDx, Constants.shooterkD);
+    hoodMotor.selectProfileSlot(Constants.hoodSlotIDx, Constants.hoodPIDIDx);
+    hoodMotor.config_kF(Constants.hoodSlotIDx, Constants.hoodkF);
+    hoodMotor.config_kP(Constants.hoodSlotIDx, Constants.hoodkP);
+    hoodMotor.config_kI(Constants.hoodSlotIDx, Constants.hoodkI);
+    hoodMotor.config_kD(Constants.hoodSlotIDx, Constants.hoodkD);
 
     // Configure turret motor
     turretMotor.configFactoryDefault();
@@ -140,8 +142,10 @@ public class Shooter extends SubsystemBase {
     turretMotor.configNominalOutputForward(Constants.motorNominal);
     turretMotor.configNominalOutputReverse(Constants.motorNominal);
     turretMotor.configPeakOutputForward(Constants.motorPeakF);
-    turretMotor.configPeakOutputForward(Constants.motorPeakR);
+    turretMotor.configPeakOutputReverse(Constants.motorPeakR);
     turretMotor.setNeutralMode(NeutralMode.Brake);
+    // Config neutral deadband
+    turretMotor.configNeutralDeadband(0.001);
     // Config motion magic closed loop gains
     turretMotor.selectProfileSlot(Constants.turretSlotIDx, Constants.turretPIDIDx);
     turretMotor.config_kF(Constants.turretSlotIDx, Constants.turretkF);
@@ -275,17 +279,17 @@ public class Shooter extends SubsystemBase {
   /**
    * Calculates the ideal initial velocity of the ball required to shoot at into the target.
    * @param tvec The translation vector at the point where the ball leaves the shooter in the order of x, y, and z.
+   * @param distanceToTarget The distance to the target.
    * @param hoodAngle The target angle of the hood in radians.
    * @param g Acceleration due to gravity in meters per second^2.
    * @return The ideal initial velocity of the ball in meters per second.
    */
-  public double calculateIdealInitialVelocity(double[] tvec, double hoodAngle, double g) {
+  public double calculateIdealInitialVelocity(double[] tvec, double distanceToTarget, double hoodAngle, double g) {
     // Get the necessary values from tvec
     double y = tvec[1];
-    double z = tvec[2];
     // Get the ideal initial velocity
-    double a = Math.pow(z, 2) * g;
-    double b = z * Math.sin(2 * hoodAngle) - 2 * y * Math.pow(Math.cos(hoodAngle), 2);
+    double a = Math.pow(distanceToTarget, 2) * g;
+    double b = distanceToTarget * Math.sin(2 * hoodAngle) - 2 * y * Math.pow(Math.cos(hoodAngle), 2);
     double idealInitialVelocity = Math.sqrt(a / b);
 
     return idealInitialVelocity;
@@ -437,7 +441,7 @@ public class Shooter extends SubsystemBase {
    * @param flywheelRadius Radius of the flywheel in meters.
    * @return The rotations per minute of the flywheel.
    */
-  double initVToRPM(double initialVelocity, double flywheelRadius) {
+  public double initVToRPM(double initialVelocity, double flywheelRadius) {
     // Get tangential velocity of the ball and shooter
     double tangentialVelocity = initialVelocity * 2;
     // Get the RPM of the flywheel
@@ -452,7 +456,7 @@ public class Shooter extends SubsystemBase {
    * @param ticksPerRevolution Encoder ticks per wheel revolution.
    * @return Encoder ticks per second.
    */
-  double RPMToTicksPerSecond(double RPM, double ticksPerRevolution) {
+  public double RPMToTicksPerSecond(double RPM, double ticksPerRevolution) {
     // Get the ticks per second
     double ticksPerSecond = RPM / 60 * ticksPerRevolution;
 
@@ -460,26 +464,31 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Set the shooter motors to a certain velocity based on encoder ticks per 100 ms.
-   * @param unitsPer100ms Encoder ticks per 100 ms.
+   * Moves the hood to the target angle.
+   * @param targetAngle The target angle for the hood in radians.
+   * @param ticksPerRevolution The ticks per revolution of the hood about the flywheel.
+   * @return The target in encoder ticks.
    */
-  public void setShooterVelocity(int unitsPer100ms) {
-    shooterMotor.set(ControlMode.Velocity, unitsPer100ms);
-  }
-  
-  /**
-   * Set the hood motor to a certain encoder tick.
-   * @param positionInTicks Target in encoder ticks.
-   */
-  public void setHoodPosition(int positionInTicks) {
-    hoodMotor.set(ControlMode.Position, positionInTicks);
+  public int getHoodTicksToTargetAngle(double targetAngle, double ticksPerRevolution) {
+    // Get the encoder tick
+    int targetTick = (int) (targetAngle * (ticksPerRevolution / (2 * Math.PI)));
+    // Move the hood
+    return targetTick;
   }
 
   /**
-   * Set the turret motor to a certain encoder tick.
-   * @param positionInTicks Target in encoder ticks.
+   * Moves the turret to the target angle.
+   * @param yawToTarget The angle to move the hood to the target in radians.
+   * @param ticksPerRevolution The ticks per revolution of the turret.
+   * @return The target in encoder ticks.
    */
-  public void setTurretPosition(int positionInTicks) {
+  public int getTurretTicksToTargetAngle(double yawToTarget, double ticksPerRevolution) {
+    // Get the delta / yaw to target in ticks
+    int delta = (int) (yawToTarget * (ticksPerRevolution / (2 * Math.PI)));
+    // Get the turret's current position
+    int currentPosition = turretMotor.getSelectedSensorPosition();
+    // Move the turret
+    //setTurretPosition(currentPosition + delta);
+    return currentPosition + delta;
   }
-
 }
