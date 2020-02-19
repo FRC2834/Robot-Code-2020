@@ -36,23 +36,29 @@ public class AimTurret extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double[] cameraTvec = subsystem.getTvec();
-    double[] rotatedTvec = subsystem.rotateTvec(cameraTvec, Constants.cameraAngleOfElevation);
-    double[] flywheelTvec = subsystem.translateTvec(rotatedTvec, Constants.deltaX, Constants.deltaY, Constants.deltaZ);
-    double yaw = subsystem.getYawToTarget(flywheelTvec);
-    double hoodTarget = subsystem.calculateHoodAngle(flywheelTvec);
-    double[] hoodTranslation = subsystem.calculateHoodTranslation(hoodTarget, Constants.flywheelRadius, Constants.ballRadius);
-    double[] hoodTvec = subsystem.translateTvec(flywheelTvec, 0, hoodTranslation[0], hoodTranslation[1]);
-    double distanceToTarget = subsystem.getDistanceToTarget(hoodTvec);
-    double idealInitV = subsystem.calculateIdealInitialVelocity(hoodTvec, distanceToTarget, hoodTarget, Constants.motionConstants.g);
-    double correctedInitV = subsystem.calculateCorrectedVelocity(idealInitV, hoodTarget, Constants.ballRadius, Constants.motionConstants, Constants.targetHeight - hoodTvec[1], Constants.t, Constants.vStep, distanceToTarget, Constants.targetHeight);
-    double RPM = subsystem.initVToRPM(correctedInitV, Constants.flywheelRadius);
-    double flywheelTicks = subsystem.RPMToTicksPerSecond(RPM, Constants.flywheelTicksPerRevolution);
-    int hoodTick = subsystem.getHoodTicksToTargetAngle(hoodTarget, Constants.hoodTicksPerRevolution);
-    int turretTick = subsystem.getTurretTicksToTargetAngle(yaw, Constants.turretTicksPerRevolution);
-    subsystem.shooterMotor.set(ControlMode.Velocity, flywheelTicks / 10);
-    subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodTick);
-    subsystem.turretMotor.set(ControlMode.MotionMagic, turretTick);
+    if(SmartDashboard.getBoolean("Target Detected?", false)) {
+      double ticksToTarget = subsystem.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0), Constants.turretTicksPerRevolution);
+      subsystem.turretMotor.set(ControlMode.MotionMagic, subsystem.turretMotor.getSelectedSensorPosition() - ticksToTarget);
+      
+      double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("targetHoodAngle", Math.PI / 4), Constants.hoodTicksPerRevolution);
+      subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks - Constants.hoodZeroTicks);
+
+      double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("shooterV (rads/sec)", 0.0) , Constants.flywheelTicksPerRevolution) * Constants.shooterVMultiplier;
+      subsystem.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
+
+      SmartDashboard.putBoolean("Tracking?", true);
+      SmartDashboard.putNumber("Target Tick", subsystem.turretMotor.getSelectedSensorPosition() - ticksToTarget);
+
+      SmartDashboard.putNumber("Hood Target Tick", hoodAngleTicks);
+      SmartDashboard.putNumber("Hood Tick", subsystem.hoodMotor.getSelectedSensorPosition());
+      SmartDashboard.putNumber("Hood Target Angle Deg", SmartDashboard.getNumber("targetHoodAngle", 0) * (180 / Math.PI));
+
+      SmartDashboard.putNumber("Target velocity", shooterTicksPer100Ms * 10 / Constants.flywheelTicksPerRevolution * 60);
+      SmartDashboard.putNumber("Shooter velocity", subsystem.shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
+    } else {
+      subsystem.shooterMotor.set(ControlMode.Velocity, 0.0);
+      SmartDashboard.putBoolean("Tracking?", false);
+    }
   }
 
   // Called once the command ends or is interrupted.

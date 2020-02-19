@@ -17,10 +17,10 @@ package frc.robot;
  */
 public interface Constants {
     // Drive motor controller IDs
-    public static int leftFrontID = 0;
-    public static int leftBackID = 1;
-    public static int rightFrontID = 2;
-    public static int rightBackID = 3;
+    public static int leftFrontID = 1;
+    public static int leftBackID = 2;
+    public static int rightFrontID = 3;
+    public static int rightBackID = 4;
 
     // Shooter motor IDs
     // public static int shooterID0 = 4;
@@ -52,8 +52,8 @@ public interface Constants {
     // Shooter motor config constants
     public static int shooterSlotIDx = 0;
     public static int shooterPIDIDx = 0;
-    public static double shooterkF = 0.1;
-    public static double shooterkP = 0.1;
+    public static double shooterkF = 0.95 * 1023 / 86128;
+    public static double shooterkP = 0.0;
     public static double shooterkI = 0.0;
     public static double shooterkD = 0.0;
 
@@ -61,30 +61,23 @@ public interface Constants {
     public static int hoodPeriod = 10;
     public static int hoodSlotIDx = 0;
     public static int hoodPIDIDx = 0;
-    public static double hoodkF = 0.0;
-    public static double hoodkP = 0.0;
+    public static double hoodkF = 0.95 * 1023 / 1145;
+    public static double hoodkP = 0.7;
     public static double hoodkI = 0.0;
     public static double hoodkD = 0.0;
-    public static int hoodCruiseVelocity = 2264;
-    public static int hoodAcceleration = 2264;
+    public static int hoodCruiseVelocity = 1145;
+    public static int hoodAcceleration = 1145 * 4;
 
     // Turret motor config constants
     public static int turretPeriod = 10;
     public static int turretPIDIDx = 0;
     public static int turretSlotIDx = 0;
-    public static double turretkF = 0.95 * 1023 / 2264;
-    public static double turretkP = 0.0;
-    public static double turretkI = 0.0;
-    public static double turretkD = 0.0;
-    public static int turretCruiseVelocity = 2264;
-    public static int turretAcceleration = 2264;
-
-    // Camera position constants
-    public static double cameraAngleOfElevation = Math.PI / 4; // Radians
-    // Camera offset from flywheel
-    public static double deltaX = 0; // Meters
-    public static double deltaY = 0; // Meters
-    public static double deltaZ = 0; // Meters
+    public static double turretkF = 0.95 * 1023 / 2249;
+    public static double turretkP = 0.125 * 1023 / (0.15 / (2 * Math.PI) * 20480);
+    public static double turretkI = 0.00031;
+    public static double turretkD = 225 * turretkP;
+    public static int turretCruiseVelocity = 2249;
+    public static int turretAcceleration = 2249 * 2;
 
     // Flywheel radius
     public static double flywheelRadius = 0.0762; // Meters
@@ -108,4 +101,14 @@ public interface Constants {
     public static double flywheelTicksPerRevolution = 4096 * 2.25;
     public static double hoodTicksPerRevolution = 4096 * (370 / 18);
     public static double turretTicksPerRevolution = 4096 * (202 / 36);
+
+    // Hood zero angle
+    public static double hoodZeroAngle = 11 * (Math.PI / 180);
+    public static double hoodZeroTicks = hoodZeroAngle * (hoodTicksPerRevolution / (2 * Math.PI));
+
+    // Drive ticks per revolution
+    public static double driveTicksPerRevolution = 42;
+
+    // Shooter speed multiplier
+    public static double shooterVMultiplier = 1.4;
 }
