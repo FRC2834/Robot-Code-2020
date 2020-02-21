@@ -43,7 +43,11 @@ public class AimTurret extends CommandBase {
       double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("targetHoodAngle", Math.PI / 4), Constants.hoodTicksPerRevolution);
       subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks - Constants.hoodZeroTicks);
 
-      double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("shooterV (rads/sec)", 0.0) , Constants.flywheelTicksPerRevolution) * Constants.shooterVMultiplier;
+      //double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("shooterV (rads/sec)", 0.0) , Constants.flywheelTicksPerRevolution) * Constants.shooterVMultiplier;
+      // double shooterTicksPer100Ms = SmartDashboard.getNumber("rpm", 0.0) / 600 * Constants.flywheelTicksPerRevolution;
+      double rpm = subsystem.getClosestRPM(SmartDashboard.getNumber("distance", 0.0));
+      double shooterTicksPer100Ms = rpm / 600 * Constants.flywheelTicksPerRevolution;
+      SmartDashboard.putNumber("shooter 100 Ms", shooterTicksPer100Ms);
       subsystem.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
 
       SmartDashboard.putBoolean("Tracking?", true);
