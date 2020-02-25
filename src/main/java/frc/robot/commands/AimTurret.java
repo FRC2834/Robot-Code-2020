@@ -40,14 +40,12 @@ public class AimTurret extends CommandBase {
       double ticksToTarget = subsystem.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0), Constants.turretTicksPerRevolution);
       subsystem.turretMotor.set(ControlMode.MotionMagic, subsystem.turretMotor.getSelectedSensorPosition() - ticksToTarget);
       
-      double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("targetHoodAngle", Math.PI / 4), Constants.hoodTicksPerRevolution);
+      // double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("targetHoodAngle", Math.PI / 4), Constants.hoodTicksPerRevolution);
+      double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("angle", Math.PI / 4) * (Math.PI / 180), Constants.hoodTicksPerRevolution);
       subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks - Constants.hoodZeroTicks);
 
       //double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("shooterV (rads/sec)", 0.0) , Constants.flywheelTicksPerRevolution) * Constants.shooterVMultiplier;
-      // double shooterTicksPer100Ms = SmartDashboard.getNumber("rpm", 0.0) / 600 * Constants.flywheelTicksPerRevolution;
-      double rpm = subsystem.getClosestRPM(SmartDashboard.getNumber("distance", 0.0));
-      double shooterTicksPer100Ms = rpm / 600 * Constants.flywheelTicksPerRevolution;
-      SmartDashboard.putNumber("shooter 100 Ms", shooterTicksPer100Ms);
+      double shooterTicksPer100Ms = SmartDashboard.getNumber("rpm", 0.0) / 600 * Constants.flywheelTicksPerRevolution;
       subsystem.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
 
       SmartDashboard.putBoolean("Tracking?", true);
@@ -60,7 +58,7 @@ public class AimTurret extends CommandBase {
       SmartDashboard.putNumber("Target velocity", shooterTicksPer100Ms * 10 / Constants.flywheelTicksPerRevolution * 60);
       SmartDashboard.putNumber("Shooter velocity", subsystem.shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
     } else {
-      subsystem.shooterMotor.set(ControlMode.Velocity, 0.0);
+      subsystem.shooterMotor.set(ControlMode.PercentOutput, 0.0);
       SmartDashboard.putBoolean("Tracking?", false);
     }
   }

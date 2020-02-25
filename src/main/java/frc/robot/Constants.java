@@ -52,9 +52,8 @@ public interface Constants {
     // Shooter motor config constants
     public static int shooterSlotIDx = 0;
     public static int shooterPIDIDx = 0;
-    //public static double shooterkF = 0.95 * 1023 / 86128;
-    public static double shooterkF = 0.01;
-    public static double shooterkP = 0.0;
+    public static double shooterkF = 0.95 * 1023 / 86128;
+    public static double shooterkP = 0.04;
     public static double shooterkI = 0.0;
     public static double shooterkD = 0.0;
 

@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     SmartDashboard.putNumber("rpm", 1000);
+    SmartDashboard.putNumber("angle", 45);
   }
 
   /**

@@ -182,30 +182,4 @@ public class Shooter extends SubsystemBase {
 
     return targetTicksPer100Ms;
   }
-
-  public double getClosestRPM(double targetDistance) {
-    double rpm = 0;
-    if(targetDistance > 3) {
-      rpm = 3000.0;
-    }
-    if(targetDistance > 3.5) {
-      rpm = 3200.0;
-    }
-    if(targetDistance > 4) {
-      rpm = 3400.0;
-    }
-    if(targetDistance > 4.5) {
-      rpm = 3500.0;
-    }
-    if(targetDistance > 5) {
-      rpm = 3600.0;
-    }
-    if(targetDistance > 5.5) {
-      rpm = 3700.0;
-    }
-    if(targetDistance > 6) {
-      rpm = 3800.0;
-    }
-    return rpm;
-  }
 }
