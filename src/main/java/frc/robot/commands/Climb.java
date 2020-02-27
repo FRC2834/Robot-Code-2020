@@ -45,6 +45,8 @@ public class Climb extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    leftRatchetReleased = false;
+    rightRatchetReleased = false;
     if(buttonBox.getRawButton(Constants.climbModeButton)) {
       // Get the start time of the command
       startTime = Timer.getFPGATimestamp();
@@ -56,59 +58,59 @@ public class Climb extends CommandBase {
         case DOWN:
           break;
       }
-    } else {
-      end(false);
     }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    switch(direction) {
-      case UP:
-        if(climber.climberEncoderLeft.getPosition() <= Constants.climberHighTick) {
-          if(leftRatchetReleased) {
-            climber.climberMotorLeft.set(Constants.climberUpSpeed);
-          } else {
-            if(Timer.getFPGATimestamp() - startTime >= Constants.climbUpDelay) {
-              climber.climberMotorLeft.set(-0.5);
-                if(Timer.getFPGATimestamp() - startTime >= Constants.climbUpDelay2) {
-                  leftRatchetReleased = true;
-                }
+    if(buttonBox.getRawButton(Constants.climbModeButton)) {
+      switch(direction) {
+        case UP:
+          if(climber.climberEncoderLeft.getPosition() <= Constants.climberHighTick) {
+            if(leftRatchetReleased) {
+              climber.climberMotorLeft.set(Constants.climberUpSpeed);
+            } else {
+              if(Timer.getFPGATimestamp() - startTime >= Constants.climbUpDelay) {
+                climber.climberMotorLeft.set(-0.25);
+                  if(Timer.getFPGATimestamp() - startTime >= Constants.climbUpDelay2) {
+                    leftRatchetReleased = true;
+                  }
+              }
             }
-          }
-        } else {
-          climber.climberMotorLeft.set(0.0);
-        }
-
-        if(climber.climberEncoderRight.getPosition() <= Constants.climberHighTick) {
-          if(rightRatchetReleased) {
-            climber.climberMotorRight.set(Constants.climberUpSpeed);
           } else {
-            if(Timer.getFPGATimestamp() - startTime >= Constants.climbUpDelay) {
-              climber.climberMotorRight.set(-0.5);
-                if(Timer.getFPGATimestamp() - startTime >= Constants.climbUpDelay2) {
-                  rightRatchetReleased = true;
-                }
-            }
+            climber.climberMotorLeft.set(0.0);
           }
-        } else {
-          climber.climberMotorRight.set(0.0);
-        }
-        break;
-      case DOWN:
-        if(climber.climberEncoderLeft.getPosition() >= Constants.climberLowTick) {
-          climber.climberMotorLeft.set(Constants.climberDownSpeed);
-        } else {
-          climber.climberMotorLeft.set(0.0);
-        }
 
-        if(climber.climberEncoderRight.getPosition() >= Constants.climberLowTick) {
-          climber.climberMotorRight.set(Constants.climberDownSpeed);
-        } else {
-          climber.climberMotorRight.set(0.0);
-        }
-        break;
+          if(climber.climberEncoderRight.getPosition() <= Constants.climberHighTick) {
+            if(rightRatchetReleased) {
+              climber.climberMotorRight.set(Constants.climberUpSpeed);
+            } else {
+              if(Timer.getFPGATimestamp() - startTime >= Constants.climbUpDelay) {
+                climber.climberMotorRight.set(-0.25);
+                  if(Timer.getFPGATimestamp() - startTime >= Constants.climbUpDelay2) {
+                    rightRatchetReleased = true;
+                  }
+              }
+            }
+          } else {
+            climber.climberMotorRight.set(0.0);
+          }
+          break;
+        case DOWN:
+          if(climber.climberEncoderLeft.getPosition() > Constants.climberLowTick) {
+            climber.climberMotorLeft.set(Constants.climberDownSpeed);
+          } else {
+            climber.climberMotorLeft.set(0.0);
+          }
+
+          if(climber.climberEncoderRight.getPosition() > Constants.climberLowTick) {
+            climber.climberMotorRight.set(Constants.climberDownSpeed);
+          } else {
+            climber.climberMotorRight.set(0.0);
+          }
+          break;
+      }
     }
   }
 

@@ -103,6 +103,10 @@ public interface Constants {
     public static double hoodTicksPerRevolution = 4096 * (370 / 18);
     public static double turretTicksPerRevolution = 4096 * (202 / 36);
 
+    // Turret tick limits
+    public static double turretLowLimitTick = -4674.0;
+    public static double turretHighLimitTick = 21470.0;
+
     // Hood zero angle
     public static double hoodZeroAngle = 11 * (Math.PI / 180);
     public static double hoodZeroTicks = hoodZeroAngle * (hoodTicksPerRevolution / (2 * Math.PI));
@@ -156,7 +160,7 @@ public interface Constants {
     public static double climberUpSpeed = 0.5;
     public static double climberDownSpeed = -0.95;
     public static double climbUpDelay = 0.25;
-    public static double climbUpDelay2 = climbUpDelay + 0.01;
+    public static double climbUpDelay2 = climbUpDelay + 0.2;
     public static double climberTicksPerRevolution = 42.0;
     public static int climberHighTick = 4500;
     public static int climberLowTick = 0;

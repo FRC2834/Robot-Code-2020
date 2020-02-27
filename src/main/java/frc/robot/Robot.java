@@ -92,6 +92,8 @@ public class Robot extends TimedRobot {
     }
 
     m_robotContainer.pneumatics.ratchetSolenoid.set(false);
+    m_robotContainer.climber.climberEncoderLeft.setPosition(0);
+    m_robotContainer.climber.climberEncoderRight.setPosition(0);
   }
 
   /**

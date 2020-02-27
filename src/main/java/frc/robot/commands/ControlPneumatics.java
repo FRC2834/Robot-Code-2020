@@ -13,7 +13,7 @@ import frc.robot.subsystems.Pneumatics;
 
 public class ControlPneumatics extends CommandBase {
 
-  Pneumatics subsystem;
+  Pneumatics pneumatics;
   public enum Solenoid {
     ARM_SOLENOID,
     RATCHET_SOLENOID
@@ -25,23 +25,23 @@ public class ControlPneumatics extends CommandBase {
   /**
    * Creates a new ControlPneumatics.
    */
-  public ControlPneumatics(Pneumatics subsystem, Solenoid solenoid, Value value) {
-    this.subsystem = subsystem;
+  public ControlPneumatics(Pneumatics pneumatics, Solenoid solenoid, Value value) {
+    this.pneumatics = pneumatics;
     this.solenoid = solenoid;
     this.value = value;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.subsystem);
+    addRequirements(this.pneumatics);
   }
 
   /**
    * Creates a new ControlPneumatics.
    */
-  public ControlPneumatics(Pneumatics subsystem, Solenoid solenoid, Boolean value) {
-    this.subsystem = subsystem;
+  public ControlPneumatics(Pneumatics pneumatics, Solenoid solenoid, Boolean value) {
+    this.pneumatics = pneumatics;
     this.solenoid = solenoid;
     this.valueBoolean = value;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.subsystem);
+    addRequirements(this.pneumatics);
   }
 
   // Called when the command is initially scheduled.
@@ -54,10 +54,10 @@ public class ControlPneumatics extends CommandBase {
   public void execute() {
     switch(solenoid) {
       case ARM_SOLENOID:
-        subsystem.armSolenoid.set(value);
+        pneumatics.armSolenoid.set(value);
         break;
       case RATCHET_SOLENOID:
-        subsystem.ratchetSolenoid.set(valueBoolean);
+        pneumatics.ratchetSolenoid.set(valueBoolean);
         break;
     }
   }

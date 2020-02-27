@@ -79,8 +79,8 @@ public class RobotContainer {
     feedButton.whenHeld(new ControlFeeder(ballManager, Constants.feedPower));
     armButton.whenPressed(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kReverse));
     armButton.whenReleased(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kForward));
-    climbUpButton.whenHeld(new Climb(climber, pneumatics, Direction.UP));
-    climbDownButton.whenHeld(new Climb(climber, pneumatics, Direction.DOWN));
+    climbUpButton.whenHeld(new Climb(climber, pneumatics, Direction.UP, buttonBox));
+    climbDownButton.whenHeld(new Climb(climber, pneumatics, Direction.DOWN, buttonBox));
   }
 
 

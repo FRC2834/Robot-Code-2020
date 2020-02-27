@@ -69,5 +69,6 @@ public class BallManager extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Carousel Current", carouselMotor.getStatorCurrent());
   }
 }
