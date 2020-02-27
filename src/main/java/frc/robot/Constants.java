@@ -119,23 +119,25 @@ public interface Constants {
 
     // Buttons
     // Intake
-    public static int intakeButton = 11;
+    public static int intakeButton = 10;
     public static double intakePower = 0.95;
     // Output
-    public static int outputButton = 2;
+    public static int outputButton = 11;
     public static double outputPower = -0.95;
     // Feed
-    public static int feedButton = 3;
+    public static int feedButton = 2;
     public static double feedPower = 0.95;
     // Arm
     public static int armButton = 12;
     public static Value armValue = Value.kReverse;
     // Climber up
-    public static int climberUpButton = 7;
+    public static int climberUpButton = 4;
     // Climber down
-    public static int climberDownButton = 8;
+    public static int climberDownButton = 6;
     // Climb mode
-    public static int climbModeButton = 6;
+    public static int climbModeButton = 5;
+    // Aimbot toggle
+    public static int aimBotButton = 3;
 
     // Current limits
     // Turret current limit
@@ -151,6 +153,12 @@ public interface Constants {
     public static double maxHoodTickError = 227.5555555556;
     public static double maxFlywheelRPMError = 50;
 
+    // Ball manager parameters
+    public static double carouselPower = 0.95;
+    public static double jamCurrent = 11.0;
+    public static double unjamPower = -0.95;
+    public static double unjamDuration = 0.25;
+
     // PCM solenoid channel
     public static int armSolenoidForward = 2;
     public static int armSolenoidReverse = 1;
@@ -159,7 +167,7 @@ public interface Constants {
     // Climber parameters
     public static double climberUpSpeed = 0.5;
     public static double climberDownSpeed = -0.95;
-    public static double climbUpDelay = 0.25;
+    public static double climbUpDelay = 0.125;
     public static double climbUpDelay2 = climbUpDelay + 0.2;
     public static double climberTicksPerRevolution = 42.0;
     public static int climberHighTick = 4500;

@@ -63,7 +63,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     driveTrain.setDefaultCommand(new Drive(driveTrain, controller));
-    shooter.setDefaultCommand(new AimTurret(shooter));
+    shooter.setDefaultCommand(new AimTurret(shooter, buttonBox));
     ballManager.setDefaultCommand(new ControlCarousel(ballManager, 0.0));
   }
 
