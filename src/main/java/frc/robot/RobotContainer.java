@@ -8,14 +8,26 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.commands.AimTurret;
+import frc.robot.commands.Climb;
+import frc.robot.commands.ControlCarousel;
+import frc.robot.commands.ControlFeeder;
+import frc.robot.commands.ControlIntake;
+import frc.robot.commands.ControlPneumatics;
 import frc.robot.commands.Drive;
-import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.Climb.Direction;
+import frc.robot.commands.ControlPneumatics.Solenoid;
+import frc.robot.subsystems.BallManager;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Pneumatics;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -25,21 +37,24 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
   public final DriveTrain driveTrain = new DriveTrain();
   public final Shooter shooter = new Shooter();
+  public final Intake intake = new Intake();
+  public final BallManager ballManager = new BallManager();
+  public final Pneumatics pneumatics = new Pneumatics();
+  public final Climber climber = new Climber();
 
   // Controllers
   XboxController controller = new XboxController(0);
-  
-  // Commands
-  private final AimTurret AimTurret = new AimTurret(shooter);
-  private final Drive drive = new Drive(driveTrain, controller);
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  Joystick buttonBox = new Joystick(1);
 
-
-
+  // Buttons and Triggers
+  JoystickButton intakeButton = new JoystickButton(buttonBox, Constants.intakeButton);
+  JoystickButton outputButton = new JoystickButton(buttonBox, Constants.outputButton);
+  JoystickButton feedButton = new JoystickButton(buttonBox, Constants.feedButton);
+  JoystickButton armButton = new JoystickButton(buttonBox, Constants.armButton);
+  JoystickButton climbUpButton = new JoystickButton(buttonBox, Constants.climberUpButton);
+  JoystickButton climbDownButton = new JoystickButton(buttonBox, Constants.climberDownButton);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -47,8 +62,9 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    driveTrain.setDefaultCommand(drive);
-    shooter.setDefaultCommand(AimTurret);
+    driveTrain.setDefaultCommand(new Drive(driveTrain, controller));
+    shooter.setDefaultCommand(new AimTurret(shooter));
+    ballManager.setDefaultCommand(new ControlCarousel(ballManager, 0.0));
   }
 
   /**
@@ -58,6 +74,13 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    intakeButton.whenHeld(new ControlIntake(intake, Constants.intakePower));
+    outputButton.whenHeld(new ControlIntake(intake, Constants.outputPower));
+    feedButton.whenHeld(new ControlFeeder(ballManager, Constants.feedPower));
+    armButton.whenPressed(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kReverse));
+    armButton.whenReleased(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kForward));
+    climbUpButton.whenHeld(new Climb(climber, pneumatics, Direction.UP));
+    climbDownButton.whenHeld(new Climb(climber, pneumatics, Direction.DOWN));
   }
 
 
@@ -68,6 +91,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
+    Command m_autoCommand = new ControlIntake(intake, 0.5);
     return m_autoCommand;
   }
 }

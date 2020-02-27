@@ -36,30 +36,49 @@ public class AimTurret extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // Check if the target is detected
     if(SmartDashboard.getBoolean("Target Detected?", false)) {
+      // Point the turret at the target 
       double ticksToTarget = subsystem.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0), Constants.turretTicksPerRevolution);
       subsystem.turretMotor.set(ControlMode.MotionMagic, subsystem.turretMotor.getSelectedSensorPosition() - ticksToTarget);
-      
-      // double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("targetHoodAngle", Math.PI / 4), Constants.hoodTicksPerRevolution);
-      double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("angle", Math.PI / 4) * (Math.PI / 180), Constants.hoodTicksPerRevolution);
-      subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks - Constants.hoodZeroTicks);
-
-      //double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("shooterV (rads/sec)", 0.0) , Constants.flywheelTicksPerRevolution) * Constants.shooterVMultiplier;
-      double shooterTicksPer100Ms = SmartDashboard.getNumber("rpm", 0.0) / 600 * Constants.flywheelTicksPerRevolution;
+      // Move the hood to the target angle
+      double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("hoodAngle (deg)", 45), Constants.hoodTicksPerRevolution);
+      subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks);
+      // Set the velocity of the flywheel
+      double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("targetRPM", 0.0), Constants.flywheelTicksPerRevolution);
       subsystem.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
 
+      // Set tracking status to true
       SmartDashboard.putBoolean("Tracking?", true);
-      SmartDashboard.putNumber("Target Tick", subsystem.turretMotor.getSelectedSensorPosition() - ticksToTarget);
 
-      SmartDashboard.putNumber("Hood Target Tick", hoodAngleTicks);
-      SmartDashboard.putNumber("Hood Tick", subsystem.hoodMotor.getSelectedSensorPosition());
-      SmartDashboard.putNumber("Hood Target Angle Deg", SmartDashboard.getNumber("targetHoodAngle", 0) * (180 / Math.PI));
+      // Target tick of the turret
+      double turretTargetTick = subsystem.turretMotor.getSelectedSensorPosition() - ticksToTarget;
+      SmartDashboard.putNumber("Target Turret Tick", turretTargetTick);
+      // Target tick of the hood
+      double hoodTargetTick = hoodAngleTicks;
+      SmartDashboard.putNumber("Hood Target Tick", hoodTargetTick);
+      // Target velocity of the flywheel
+      double targetRPM = shooterTicksPer100Ms * 10 / Constants.flywheelTicksPerRevolution * 60;
+      SmartDashboard.putNumber("Target RPM", targetRPM);
 
-      SmartDashboard.putNumber("Target velocity", shooterTicksPer100Ms * 10 / Constants.flywheelTicksPerRevolution * 60);
-      SmartDashboard.putNumber("Shooter velocity", subsystem.shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
+      // Get the errors
+      double turretYawError = Math.abs(SmartDashboard.getNumber("turretYawError", 0.0));
+      double hoodTickError = Math.abs(hoodTargetTick - subsystem.hoodMotor.getSelectedSensorPosition());
+      double flywheelRPMError = Math.abs(targetRPM - subsystem.shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
+
+      // Check if the shooter is locked on to the target
+      if((turretYawError <= Constants.maxTurretYawError) && (hoodTickError <= Constants.maxHoodTickError) && (flywheelRPMError <= Constants.maxFlywheelRPMError)) {
+        SmartDashboard.putBoolean("Target Locked", true);
+      } else {
+        SmartDashboard.putBoolean("Target Locked", false);
+      }
     } else {
+      // Turn off the flywheel
       subsystem.shooterMotor.set(ControlMode.PercentOutput, 0.0);
+
+      // Set tracking status to false
       SmartDashboard.putBoolean("Tracking?", false);
+      SmartDashboard.putBoolean("Target Locked", false);
     }
   }
 

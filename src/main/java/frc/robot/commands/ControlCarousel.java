@@ -7,21 +7,24 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveTrain;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
-public class Drive extends CommandBase {
-  private final DriveTrain subsystem;
-  private final XboxController controller;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.BallManager;
+
+public class ControlCarousel extends CommandBase {
+
+  BallManager subsystem;
+  double power;
+
   /**
-   * Creates a new Drive.
+   * Creates a new ControlCarousel.
    */
-  public Drive(DriveTrain subsystem, XboxController controller) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  public ControlCarousel(BallManager subsystem, double power) {
     this.subsystem = subsystem;
-    this.controller = controller;
+    this.power = power;
+    // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.subsystem);
   }
 
@@ -33,21 +36,7 @@ public class Drive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double power;
-    double turn;
-
-    if(Math.abs(controller.getY(Hand.kLeft)) < 0.1) {
-      power = 0.0;
-    } else {
-      power = controller.getY(Hand.kLeft) * 0.5;
-    }
-
-    if(Math.abs(controller.getX(Hand.kRight)) < 0.1) {
-      turn = 0.0;
-    } else {
-      turn = controller.getX(Hand.kRight) * 0.5;
-    }
-    subsystem.arcadeDrive(power, turn);
+    subsystem.carouselMotor.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Carousel Power", 0.0));
   }
 
   // Called once the command ends or is interrupted.

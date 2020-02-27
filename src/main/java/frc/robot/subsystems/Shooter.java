@@ -18,9 +18,9 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.MotionConstants;
 
 public class Shooter extends SubsystemBase {
+  
   // Declare shooter motors
   public TalonSRX shooterMotor;
   public VictorSPX[] shooterFollowers;
@@ -56,8 +56,12 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    SmartDashboard.putNumber("turret encoder", turretMotor.getSelectedSensorPosition());
+    // Current hood tick
+    SmartDashboard.putNumber("Turret Tick", turretMotor.getSelectedSensorPosition());
+    // Current hood tick
+    SmartDashboard.putNumber("Hood Tick", hoodMotor.getSelectedSensorPosition());
+    // Current flywheel velocity
+    SmartDashboard.putNumber("Shooter RPM", shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
   }
 
   /**
@@ -84,12 +88,13 @@ public class Shooter extends SubsystemBase {
     shooterMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     shooterMotor.setSensorPhase(true);
     shooterMotor.setSelectedSensorPosition(0);
-    // Config peak and nominal outputs and enable coast
+    // Config peak and nominal outputs, enable coast, and current limit
     shooterMotor.configNominalOutputForward(Constants.motorNominal);
     shooterMotor.configNominalOutputReverse(Constants.motorNominal);
     shooterMotor.configPeakOutputForward(Constants.motorPeakF);
     shooterMotor.configPeakOutputReverse(Constants.motorPeakR);
     shooterMotor.setNeutralMode(NeutralMode.Coast);
+    shooterMotor.configContinuousCurrentLimit(Constants.turretCurrentLimit);
     for(VictorSPX motor : shooterFollowers) {
       motor.configNominalOutputForward(Constants.motorNominal);
       motor.configNominalOutputReverse(Constants.motorNominal);
@@ -111,7 +116,7 @@ public class Shooter extends SubsystemBase {
     // Config relative encoder and zero it
     hoodMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     hoodMotor.setSensorPhase(true);
-    hoodMotor.setSelectedSensorPosition(0);
+    hoodMotor.setSelectedSensorPosition((int) Constants.hoodZeroTicks);
     // Config relevant frame periods to be at least as fast as periodic rate
 		hoodMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, Constants.hoodPeriod);
 		hoodMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, Constants.hoodPeriod);
@@ -171,14 +176,14 @@ public class Shooter extends SubsystemBase {
     return deltaTicks;
   }
 
-  public double getHoodTargetTick(double hoodAngle, double encoderTicksPerRevolution) {
-    double targetTick = (hoodAngle / (2 * Math.PI)) * encoderTicksPerRevolution;
+  public double getHoodTargetTick(double hoodAngleDeg, double encoderTicksPerRevolution) {
+    double targetTick = hoodAngleDeg / 360 * encoderTicksPerRevolution;
 
     return targetTick;
   }
 
-  public double getShooterTicksPer100Ms(double RadsPS, double encoderTicksPerRevolution) {
-    double targetTicksPer100Ms = (RadsPS / 10) * (encoderTicksPerRevolution / (2 * Math.PI));
+  public double getShooterTicksPer100Ms(double RPM, double encoderTicksPerRevolution) {
+    double targetTicksPer100Ms = RPM / 600 * encoderTicksPerRevolution;
 
     return targetTicksPer100Ms;
   }
