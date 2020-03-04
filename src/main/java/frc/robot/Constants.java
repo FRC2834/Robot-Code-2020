@@ -99,13 +99,14 @@ public interface Constants {
     public static int carouselAcceleration = 0;
 
     // Shooter ticks per revolution
-    public static double flywheelTicksPerRevolution = 4096 * 2.25;
-    public static double hoodTicksPerRevolution = 4096 * (370 / 18);
-    public static double turretTicksPerRevolution = 4096 * (202 / 36);
+    public static double flywheelTicksPerRevolution = 4096.0 * 2.25;
+    public static double hoodTicksPerRevolution = 4096.0 * (370.0 / 18.0);
+    public static double turretTicksPerRevolution = 4096.0 * (202.0 / 36.0);
 
-    // Turret tick limits
+    // Turret tick parameters
     public static double turretLowLimitTick = -4674.0;
     public static double turretHighLimitTick = 21470.0;
+    public static int flywheelActivationThreshold = 500;
 
     // Hood zero angle
     public static double hoodZeroAngle = 11 * (Math.PI / 180);
@@ -127,6 +128,7 @@ public interface Constants {
     // Feed
     public static int feedButton = 2;
     public static double feedPower = 0.95;
+    public static double feedNeutralPower = -0.1;
     // Arm
     public static int armButton = 12;
     public static Value armValue = Value.kReverse;
@@ -154,10 +156,11 @@ public interface Constants {
     public static double maxFlywheelRPMError = 50;
 
     // Ball manager parameters
-    public static double carouselPower = 0.95;
+    public static double carouselPower = 0.75;
     public static double jamCurrent = 11.0;
-    public static double unjamPower = -0.95;
+    public static double unjamPower = -0.75;
     public static double unjamDuration = 0.25;
+    public static double pauseDuration = unjamDuration + 0.3;
 
     // PCM solenoid channel
     public static int armSolenoidForward = 2;
@@ -165,7 +168,7 @@ public interface Constants {
     public static int ratchetSolenoid = 0;
 
     // Climber parameters
-    public static double climberUpSpeed = 0.5;
+    public static double climberUpSpeed = 0.95;
     public static double climberDownSpeed = -0.95;
     public static double climbUpDelay = 0.125;
     public static double climbUpDelay2 = climbUpDelay + 0.2;

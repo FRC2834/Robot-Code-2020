@@ -115,7 +115,7 @@ public class Shooter extends SubsystemBase {
     hoodMotor.setInverted(false);
     // Config relative encoder and zero it
     hoodMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    hoodMotor.setSensorPhase(true);
+    hoodMotor.setSensorPhase(false);
     hoodMotor.setSelectedSensorPosition((int) Constants.hoodZeroTicks);
     // Config relevant frame periods to be at least as fast as periodic rate
 		hoodMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, Constants.hoodPeriod);
@@ -142,7 +142,7 @@ public class Shooter extends SubsystemBase {
     turretMotor.setInverted(false);
     // Config relative encoder and zero it
     turretMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    turretMotor.setSensorPhase(true);
+    turretMotor.setSensorPhase(false);
     turretMotor.setSelectedSensorPosition(0);
     // Config relevant frame periods to be at least as fast as periodic rate
 		turretMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, Constants.turretPeriod);

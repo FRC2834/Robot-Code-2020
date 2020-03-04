@@ -9,28 +9,22 @@ package frc.robot.commands;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.BallManager;
 
 public class ControlCarousel extends CommandBase {
 
-  BallManager subsystem;
+  BallManager ballManager;
   double power;
-  boolean isJammed;
-  double startTime;
 
   /**
    * Creates a new ControlCarousel.
    */
-  public ControlCarousel(BallManager subsystem, double power) {
-    this.subsystem = subsystem;
+  public ControlCarousel(BallManager ballManager, double power) {
+    this.ballManager = ballManager;
     this.power = power;
-    isJammed = false;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.subsystem);
+    addRequirements(this.ballManager);
   }
 
   // Called when the command is initially scheduled.
@@ -41,22 +35,8 @@ public class ControlCarousel extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(subsystem.carouselMotor.getStatorCurrent() >= Constants.jamCurrent) {
-      isJammed = true;
-      startTime = Timer.getFPGATimestamp();
-      SmartDashboard.putBoolean("Carousel Jammed?", true);
-    }
-    
-    if(isJammed) {
-      if((Timer.getFPGATimestamp() - startTime) <= Constants.unjamDuration) {
-        subsystem.carouselMotor.set(ControlMode.PercentOutput, Constants.unjamPower);
-      } else {
-        isJammed = false;
-      }
-    } else {
-      subsystem.carouselMotor.set(ControlMode.PercentOutput, Constants.carouselPower);
-      SmartDashboard.putBoolean("Carousel Jammed?", false);
-    }
+    ballManager.carouselMotor.set(ControlMode.PercentOutput, power);
+    end(false);
   }
 
   // Called once the command ends or is interrupted.

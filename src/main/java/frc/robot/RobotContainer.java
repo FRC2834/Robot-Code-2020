@@ -18,6 +18,7 @@ import frc.robot.commands.ControlFeeder;
 import frc.robot.commands.ControlIntake;
 import frc.robot.commands.ControlPneumatics;
 import frc.robot.commands.Drive;
+import frc.robot.commands.SpinCarousel;
 import frc.robot.commands.Climb.Direction;
 import frc.robot.commands.ControlPneumatics.Solenoid;
 import frc.robot.subsystems.BallManager;
@@ -51,6 +52,7 @@ public class RobotContainer {
   // Buttons and Triggers
   JoystickButton intakeButton = new JoystickButton(buttonBox, Constants.intakeButton);
   JoystickButton outputButton = new JoystickButton(buttonBox, Constants.outputButton);
+  JoystickButton aimBotButton = new  JoystickButton(buttonBox, Constants.aimBotButton);
   JoystickButton feedButton = new JoystickButton(buttonBox, Constants.feedButton);
   JoystickButton armButton = new JoystickButton(buttonBox, Constants.armButton);
   JoystickButton climbUpButton = new JoystickButton(buttonBox, Constants.climberUpButton);
@@ -63,8 +65,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     driveTrain.setDefaultCommand(new Drive(driveTrain, controller));
-    shooter.setDefaultCommand(new AimTurret(shooter, buttonBox));
-    ballManager.setDefaultCommand(new ControlCarousel(ballManager, 0.0));
+    ballManager.setDefaultCommand(new SpinCarousel(ballManager));
   }
 
   /**
@@ -76,7 +77,9 @@ public class RobotContainer {
   private void configureButtonBindings() {
     intakeButton.whenHeld(new ControlIntake(intake, Constants.intakePower));
     outputButton.whenHeld(new ControlIntake(intake, Constants.outputPower));
-    feedButton.whenHeld(new ControlFeeder(ballManager, Constants.feedPower));
+    aimBotButton.whenHeld(new AimTurret(shooter, buttonBox));
+    feedButton.whenPressed(new ControlFeeder(ballManager, Constants.feedPower));
+    feedButton.whenInactive(new ControlFeeder(ballManager, Constants.feedNeutralPower));
     armButton.whenPressed(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kReverse));
     armButton.whenReleased(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kForward));
     climbUpButton.whenHeld(new Climb(climber, pneumatics, Direction.UP, buttonBox));

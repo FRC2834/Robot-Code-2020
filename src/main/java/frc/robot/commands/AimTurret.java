@@ -40,52 +40,50 @@ public class AimTurret extends CommandBase {
   @Override
   public void execute() {
     // Check if the target is detected
-    if(buttonBox.getRawButton(Constants.aimBotButton)) {
-      if(SmartDashboard.getBoolean("Target Detected?", false)) {
-        // Point the turret at the target 
-        double ticksToTarget = subsystem.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0), Constants.turretTicksPerRevolution);
-        double turretTargetTick = subsystem.turretMotor.getSelectedSensorPosition() - ticksToTarget;
-        if((ticksToTarget >= Constants.turretLowLimitTick) && (ticksToTarget <= Constants.turretHighLimitTick)) {
-          subsystem.turretMotor.set(ControlMode.MotionMagic, subsystem.turretMotor.getSelectedSensorPosition() - ticksToTarget);
-        }
-        // Move the hood to the target angle
-        double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("hoodAngle (deg)", 45), Constants.hoodTicksPerRevolution);
-        subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks);
-        // Set the velocity of the flywheel
-        double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("targetRPM", 0.0), Constants.flywheelTicksPerRevolution);
-        subsystem.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
+    if(SmartDashboard.getBoolean("Target Detected?", false)) {
+      // Point the turret at the target 
+      double ticksToTarget = subsystem.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0), Constants.turretTicksPerRevolution);
+      double turretTargetTick = subsystem.turretMotor.getSelectedSensorPosition() + ticksToTarget;
+      if((ticksToTarget >= Constants.turretLowLimitTick) && (ticksToTarget <= Constants.turretHighLimitTick)) {
+        subsystem.turretMotor.set(ControlMode.MotionMagic, subsystem.turretMotor.getSelectedSensorPosition() + ticksToTarget);
+      }
+      // Move the hood to the target angle
+      double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("hoodAngle (deg)", 45), Constants.hoodTicksPerRevolution);
+      subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks);
+      // Set the velocity of the flywheel
+      double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("targetRPM", 0.0), Constants.flywheelTicksPerRevolution);
+      subsystem.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
 
-        // Set tracking status to true
-        SmartDashboard.putBoolean("Tracking?", true);
+      // Set tracking status to true
+      SmartDashboard.putBoolean("Tracking?", true);
 
-        // Target tick of the turret
-        SmartDashboard.putNumber("Target Turret Tick", turretTargetTick);
-        // Target tick of the hood
-        double hoodTargetTick = hoodAngleTicks;
-        SmartDashboard.putNumber("Hood Target Tick", hoodTargetTick);
-        // Target velocity of the flywheel
-        double targetRPM = shooterTicksPer100Ms * 10 / Constants.flywheelTicksPerRevolution * 60;
-        SmartDashboard.putNumber("Target RPM", targetRPM);
+      // Target tick of the turret
+      SmartDashboard.putNumber("Target Turret Tick", turretTargetTick);
+      // Target tick of the hood
+      double hoodTargetTick = hoodAngleTicks;
+      SmartDashboard.putNumber("Hood Target Tick", hoodTargetTick);
+      // Target velocity of the flywheel
+      double targetRPM = shooterTicksPer100Ms * 10 / Constants.flywheelTicksPerRevolution * 60;
+      SmartDashboard.putNumber("Target RPM", targetRPM);
 
-        // Get the errors
-        double turretYawError = Math.abs(SmartDashboard.getNumber("turretYawError", 0.0));
-        double hoodTickError = Math.abs(hoodTargetTick - subsystem.hoodMotor.getSelectedSensorPosition());
-        double flywheelRPMError = Math.abs(targetRPM - subsystem.shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
+      // Get the errors
+      double turretYawError = Math.abs(SmartDashboard.getNumber("turretYawError", 0.0));
+      double hoodTickError = Math.abs(hoodTargetTick - subsystem.hoodMotor.getSelectedSensorPosition());
+      double flywheelRPMError = Math.abs(targetRPM - subsystem.shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
 
-        // Check if the shooter is locked on to the target
-        if((turretYawError <= Constants.maxTurretYawError) && (hoodTickError <= Constants.maxHoodTickError) && (flywheelRPMError <= Constants.maxFlywheelRPMError)) {
-          SmartDashboard.putBoolean("Target Locked", true);
-        } else {
-          SmartDashboard.putBoolean("Target Locked", false);
-        }
+      // Check if the shooter is locked on to the target
+      if((turretYawError <= Constants.maxTurretYawError) && (hoodTickError <= Constants.maxHoodTickError) && (flywheelRPMError <= Constants.maxFlywheelRPMError)) {
+        SmartDashboard.putBoolean("Target Locked", true);
       } else {
-        // Turn off the flywheel
-        subsystem.shooterMotor.set(ControlMode.PercentOutput, 0.0);
-
-        // Set tracking status to false
-        SmartDashboard.putBoolean("Tracking?", false);
         SmartDashboard.putBoolean("Target Locked", false);
       }
+    } else {
+      // Turn off the flywheel
+      subsystem.shooterMotor.set(ControlMode.PercentOutput, 0.0);
+
+      // Set tracking status to false
+      SmartDashboard.putBoolean("Tracking?", false);
+      SmartDashboard.putBoolean("Target Locked", false);
     }
 
     // Only set to setpoint if the setpoint button is pressed.
@@ -100,6 +98,9 @@ public class AimTurret extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    subsystem.shooterMotor.set(ControlMode.PercentOutput, 0.0);
+    subsystem.hoodMotor.set(ControlMode.PercentOutput, 0.0);
+    subsystem.turretMotor.set(ControlMode.PercentOutput, 0.0);
   }
 
   // Returns true when the command should end.

@@ -12,17 +12,17 @@ import frc.robot.subsystems.BallManager;
 
 public class ControlFeeder extends CommandBase {
 
-  BallManager subsystem;
+  BallManager ballManager;
   double power;
 
   /**
    * Creates a new ControlFeeder.
    */
-  public ControlFeeder(BallManager subsystem, double power) {
-    this.subsystem = subsystem;
+  public ControlFeeder(BallManager ballManager, double power) {
+    this.ballManager = ballManager;
     this.power = power;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.subsystem);
+    addRequirements(this.ballManager);
   }
 
   // Called when the command is initially scheduled.
@@ -33,13 +33,13 @@ public class ControlFeeder extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.feedMotor.set(power);
+    ballManager.feedMotor.set(power);
+    end(false);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    subsystem.feedMotor.set(0.0);
   }
 
   // Returns true when the command should end.
