@@ -103,10 +103,12 @@ public interface Constants {
     public static double hoodTicksPerRevolution = 4096.0 * (370.0 / 18.0);
     public static double turretTicksPerRevolution = 4096.0 * (202.0 / 36.0);
 
-    // Turret tick parameters
+    // Turret parameters
     public static double turretLowLimitTick = -4674.0;
     public static double turretHighLimitTick = 21470.0;
     public static int flywheelActivationThreshold = 500;
+    public static double turretManualPower = 0.5;
+    public static double hoodManualPower = 0.5;
 
     // Hood zero angle
     public static double hoodZeroAngle = 11 * (Math.PI / 180);

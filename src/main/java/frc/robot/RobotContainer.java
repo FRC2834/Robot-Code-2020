@@ -17,6 +17,7 @@ import frc.robot.commands.ControlFeeder;
 import frc.robot.commands.ControlIntake;
 import frc.robot.commands.ControlPneumatics;
 import frc.robot.commands.Drive;
+import frc.robot.commands.ManualTurret;
 import frc.robot.commands.SpinCarousel;
 import frc.robot.commands.Climb.Direction;
 import frc.robot.commands.ControlPneumatics.Solenoid;
@@ -64,6 +65,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     driveTrain.setDefaultCommand(new Drive(driveTrain, controller));
+    shooter.setDefaultCommand(new ManualTurret(shooter, controller));
     ballManager.setDefaultCommand(new SpinCarousel(ballManager));
   }
 
