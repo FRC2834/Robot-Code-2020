@@ -13,16 +13,16 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
 public class Drive extends CommandBase {
-  private final DriveTrain subsystem;
+  private final DriveTrain driveTrain;
   private final XboxController controller;
   /**
    * Creates a new Drive.
    */
-  public Drive(DriveTrain subsystem, XboxController controller) {
+  public Drive(DriveTrain driveTrain, XboxController controller) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.subsystem = subsystem;
+    this.driveTrain = driveTrain;
     this.controller = controller;
-    addRequirements(this.subsystem);
+    addRequirements(this.driveTrain);
   }
 
   // Called when the command is initially scheduled.
@@ -47,7 +47,8 @@ public class Drive extends CommandBase {
     } else {
       turn = controller.getX(Hand.kRight) * 0.5;
     }
-    subsystem.arcadeDrive(power, turn);
+    driveTrain.arcadeDrive(power, turn);
+    end(false);
   }
 
   // Called once the command ends or is interrupted.

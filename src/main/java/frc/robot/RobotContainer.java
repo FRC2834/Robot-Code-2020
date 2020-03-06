@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.commands.AimTurret;
 import frc.robot.commands.Climb;
-import frc.robot.commands.ControlCarousel;
 import frc.robot.commands.ControlFeeder;
 import frc.robot.commands.ControlIntake;
 import frc.robot.commands.ControlPneumatics;
@@ -75,13 +74,20 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    intakeButton.whenHeld(new ControlIntake(intake, Constants.intakePower));
+    intakeButton.whenPressed(new ControlIntake(intake, Constants.intakePower));
+    intakeButton.whenReleased(new ControlIntake(intake, 0.0));
+
     outputButton.whenHeld(new ControlIntake(intake, Constants.outputPower));
+    outputButton.whenHeld(new ControlIntake(intake, 0.0));
+
     aimBotButton.whenHeld(new AimTurret(shooter, buttonBox));
+    
     feedButton.whenPressed(new ControlFeeder(ballManager, Constants.feedPower));
-    feedButton.whenInactive(new ControlFeeder(ballManager, Constants.feedNeutralPower));
+    feedButton.whenReleased(new ControlFeeder(ballManager, Constants.feedNeutralPower));
+
     armButton.whenPressed(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kReverse));
     armButton.whenReleased(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kForward));
+    
     climbUpButton.whenHeld(new Climb(climber, pneumatics, Direction.UP, buttonBox));
     climbDownButton.whenHeld(new Climb(climber, pneumatics, Direction.DOWN, buttonBox));
   }

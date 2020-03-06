@@ -12,17 +12,17 @@ import frc.robot.subsystems.Intake;
 
 public class ControlIntake extends CommandBase {
 
-  Intake subsystem;
+  Intake intake;
   double power;
 
   /**
    * Creates a new ControlIntake.
    */
-  public ControlIntake(Intake subsystem, double power) {
-    this.subsystem = subsystem;
+  public ControlIntake(Intake intake, double power) {
+    this.intake = intake;
     this.power = power;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.subsystem);
+    addRequirements(this.intake);
   }
 
   // Called when the command is initially scheduled.
@@ -33,13 +33,13 @@ public class ControlIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.intakeMotor.set(power);
+    intake.intakeMotor.set(power);
+    end(false);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    subsystem.intakeMotor.set(0.0);
   }
 
   // Returns true when the command should end.

@@ -42,7 +42,7 @@ public class SpinCarousel extends CommandBase {
   @Override
   public void execute() {
     // Checks if the carousel is jammed
-    if(ballManager.carouselMotor.getStatorCurrent() >= Constants.jamCurrent) {
+    if(ballManager.carouselMotor.getBusVoltage() >= Constants.jamCurrent) {
       isJammed = true;
       startTime = Timer.getFPGATimestamp();
       SmartDashboard.putBoolean(("Carousel Jammed?"), true);

@@ -17,18 +17,18 @@ import frc.robot.subsystems.Shooter;
 
 public class AimTurret extends CommandBase {
   // The subsystem the command runs on
-  Shooter subsystem;
+  Shooter shooter;
   Joystick buttonBox;
 
   /**
    * Creates a new AimTurret.
    * @param subsystem The subsystem used by this command.
    */
-  public AimTurret(Shooter subsystem, Joystick buttonBox) {
-    this.subsystem = subsystem;
+  public AimTurret(Shooter shooter, Joystick buttonBox) {
+    this.shooter = shooter;
     this.buttonBox = buttonBox;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.subsystem);
+    addRequirements(this.shooter);
   }
 
   // Called when the command is initially scheduled.
@@ -42,17 +42,19 @@ public class AimTurret extends CommandBase {
     // Check if the target is detected
     if(SmartDashboard.getBoolean("Target Detected?", false)) {
       // Point the turret at the target 
-      double ticksToTarget = subsystem.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0), Constants.turretTicksPerRevolution);
-      double turretTargetTick = subsystem.turretMotor.getSelectedSensorPosition() + ticksToTarget;
+      double ticksToTarget = shooter.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0), Constants.turretTicksPerRevolution);
+      double turretTargetTick = shooter.turretMotor.getSelectedSensorPosition() + ticksToTarget;
       if((ticksToTarget >= Constants.turretLowLimitTick) && (ticksToTarget <= Constants.turretHighLimitTick)) {
-        subsystem.turretMotor.set(ControlMode.MotionMagic, subsystem.turretMotor.getSelectedSensorPosition() + ticksToTarget);
+        shooter.turretMotor.set(ControlMode.MotionMagic, shooter.turretMotor.getSelectedSensorPosition() + ticksToTarget);
       }
       // Move the hood to the target angle
-      double hoodAngleTicks = subsystem.getHoodTargetTick(SmartDashboard.getNumber("hoodAngle (deg)", 45), Constants.hoodTicksPerRevolution);
-      subsystem.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks);
+      double hoodAngleTicks = shooter.getHoodTargetTick(SmartDashboard.getNumber("hoodAngle (deg)", 45), Constants.hoodTicksPerRevolution);
+      shooter.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks);
       // Set the velocity of the flywheel
-      double shooterTicksPer100Ms = subsystem.getShooterTicksPer100Ms(SmartDashboard.getNumber("targetRPM", 0.0), Constants.flywheelTicksPerRevolution);
-      subsystem.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
+      double shooterTicksPer100Ms = shooter.getShooterTicksPer100Ms(SmartDashboard.getNumber("targetRPM", 0.0), Constants.flywheelTicksPerRevolution);
+      if(Math.abs(ticksToTarget) < Constants.flywheelActivationThreshold) {
+        shooter.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
+      }
 
       // Set tracking status to true
       SmartDashboard.putBoolean("Tracking?", true);
@@ -68,8 +70,8 @@ public class AimTurret extends CommandBase {
 
       // Get the errors
       double turretYawError = Math.abs(SmartDashboard.getNumber("turretYawError", 0.0));
-      double hoodTickError = Math.abs(hoodTargetTick - subsystem.hoodMotor.getSelectedSensorPosition());
-      double flywheelRPMError = Math.abs(targetRPM - subsystem.shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
+      double hoodTickError = Math.abs(hoodTargetTick - shooter.hoodMotor.getSelectedSensorPosition());
+      double flywheelRPMError = Math.abs(targetRPM - shooter.shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
 
       // Check if the shooter is locked on to the target
       if((turretYawError <= Constants.maxTurretYawError) && (hoodTickError <= Constants.maxHoodTickError) && (flywheelRPMError <= Constants.maxFlywheelRPMError)) {
@@ -79,7 +81,7 @@ public class AimTurret extends CommandBase {
       }
     } else {
       // Turn off the flywheel
-      subsystem.shooterMotor.set(ControlMode.PercentOutput, 0.0);
+      shooter.shooterMotor.set(ControlMode.PercentOutput, 0.0);
 
       // Set tracking status to false
       SmartDashboard.putBoolean("Tracking?", false);
@@ -98,9 +100,9 @@ public class AimTurret extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    subsystem.shooterMotor.set(ControlMode.PercentOutput, 0.0);
-    subsystem.hoodMotor.set(ControlMode.PercentOutput, 0.0);
-    subsystem.turretMotor.set(ControlMode.PercentOutput, 0.0);
+    shooter.shooterMotor.set(ControlMode.PercentOutput, 0.0);
+    shooter.hoodMotor.set(ControlMode.PercentOutput, 0.0);
+    shooter.turretMotor.set(ControlMode.PercentOutput, 0.0);
   }
 
   // Returns true when the command should end.

@@ -60,6 +60,7 @@ public class ControlPneumatics extends CommandBase {
         pneumatics.ratchetSolenoid.set(valueBoolean);
         break;
     }
+    end(false);
   }
 
   // Called once the command ends or is interrupted.
