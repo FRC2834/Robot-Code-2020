@@ -62,6 +62,8 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Hood Tick", hoodMotor.getSelectedSensorPosition());
     // Current flywheel velocity
     SmartDashboard.putNumber("Shooter RPM", shooterMotor.getSelectedSensorVelocity() * 10 / Constants.flywheelTicksPerRevolution * 60);
+    // Hood current
+    SmartDashboard.putNumber("Hood Current", hoodMotor.getStatorCurrent());
   }
 
   /**

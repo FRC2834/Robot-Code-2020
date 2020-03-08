@@ -9,6 +9,7 @@ package frc.robot.commands;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -18,15 +19,18 @@ import frc.robot.subsystems.BallManager;
 public class SpinCarousel extends CommandBase {
 
   BallManager ballManager;
+  Joystick buttonBox;
   boolean isJammed;
   double startTime;
 
   /**
    * Creates a new SpinCarousel.
    * @param ballManager The ball manager subsystem
+   * @param buttonBox The button box
    */
-  public SpinCarousel(BallManager ballManager) {
+  public SpinCarousel(BallManager ballManager, Joystick buttonBox) {
     this.ballManager = ballManager;
+    this.buttonBox = buttonBox;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.ballManager);
   }
@@ -42,7 +46,7 @@ public class SpinCarousel extends CommandBase {
   @Override
   public void execute() {
     // Checks if the carousel is jammed
-    if(ballManager.carouselMotor.getBusVoltage() >= Constants.jamCurrent) {
+    if(ballManager.carouselMotor.getStatorCurrent() >= Constants.jamCurrent) {
       isJammed = true;
       startTime = Timer.getFPGATimestamp();
       SmartDashboard.putBoolean(("Carousel Jammed?"), true);
@@ -61,7 +65,11 @@ public class SpinCarousel extends CommandBase {
         SmartDashboard.putBoolean("Carousel Jammed?", false);
       }
     } else {
-      ballManager.carouselMotor.set(ControlMode.PercentOutput, Constants.carouselPower);
+      if(buttonBox.getRawButton(Constants.feedButton)) {
+        ballManager.carouselMotor.set(ControlMode.PercentOutput, Constants.carouselShootPower);
+      } else {
+        ballManager.carouselMotor.set(ControlMode.PercentOutput, Constants.carouselPower);
+      }
     }
   }
 

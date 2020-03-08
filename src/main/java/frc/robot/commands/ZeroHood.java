@@ -9,22 +9,19 @@ package frc.robot.commands;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Shooter;
 
-public class ManualTurret extends CommandBase {
+public class ZeroHood extends CommandBase {
 
   Shooter shooter;
-  XboxController controller;
 
   /**
-   * Creates a new ManualTurret.
+   * Creates a new ZeroHood.
    */
-  public ManualTurret(Shooter shooter, XboxController controller) {
+  public ZeroHood(Shooter shooter) {
     this.shooter = shooter;
-    this.controller = controller;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.shooter);
   }
@@ -37,18 +34,12 @@ public class ManualTurret extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // Move the turret
-    if(controller.getPOV() == 90) {
-      shooter.turretMotor.set(ControlMode.PercentOutput, Constants.turretManualPower);
-    } else if(controller.getPOV() == 270) {
-      shooter.turretMotor.set(ControlMode.PercentOutput, -Constants.turretManualPower);
-    } else if(controller.getPOV() == 180) {
-      shooter.hoodMotor.set(ControlMode.PercentOutput, Constants.hoodManualPower);
-    } else if(controller.getPOV() == 0) {
-      shooter.hoodMotor.set(ControlMode.PercentOutput, -Constants.hoodManualPower);
-    } else {
-      shooter.turretMotor.set(ControlMode.PercentOutput, 0.0);
+    if(shooter.hoodMotor.getStatorCurrent() <= Constants.hoodJamCurrent) {
       shooter.hoodMotor.set(ControlMode.PercentOutput, 0.0);
+      shooter.hoodMotor.setSelectedSensorPosition(0);
+      end(false);
+    } else {
+      shooter.hoodMotor.set(ControlMode.PercentOutput, Constants.hoodZeroingPower);
     }
   }
 

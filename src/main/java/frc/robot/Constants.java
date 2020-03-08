@@ -34,6 +34,7 @@ public interface Constants {
     
     // Hood motor ID
     public static int hoodID = 9;
+    // public static int hoodPDPID = 
 
     // Turret motor ID
     public static int turretID = 10;
@@ -61,7 +62,7 @@ public interface Constants {
     public static int shooterSlotIDx = 0;
     public static int shooterPIDIDx = 0;
     public static double shooterkF = 0.95 * 1023 / 86128;
-    public static double shooterkP = 0.04;
+    public static double shooterkP = 0.2;
     public static double shooterkI = 0.0;
     public static double shooterkD = 0.0;
 
@@ -104,11 +105,13 @@ public interface Constants {
     public static double turretTicksPerRevolution = 4096.0 * (202.0 / 36.0);
 
     // Turret parameters
-    public static double turretLowLimitTick = -4674.0;
-    public static double turretHighLimitTick = 21470.0;
+    public static double turretLowLimitTick = -20798.0;
+    public static double turretHighLimitTick = 4177.0;
     public static int flywheelActivationThreshold = 500;
-    public static double turretManualPower = 0.5;
+    public static double turretManualPower = 0.2;
     public static double hoodManualPower = 0.5;
+    public static double hoodJamCurrent = -4.0;
+    public static double hoodZeroingPower = -0.95;
 
     // Hood zero angle
     public static double hoodZeroAngle = 11 * (Math.PI / 180);
@@ -123,9 +126,11 @@ public interface Constants {
     // Buttons
     // Intake
     public static int intakeButton = 10;
-    public static double intakePower = 0.95;
+    public static int driverIntake = 5;
+    public static double intakePower = 0.6;
     // Output
     public static int outputButton = 11;
+    public static int driverOutput = 6;
     public static double outputPower = -0.95;
     // Feed
     public static int feedButton = 2;
@@ -159,7 +164,8 @@ public interface Constants {
 
     // Ball manager parameters
     public static double carouselPower = 0.75;
-    public static double jamCurrent = 11.0;
+    public static double carouselShootPower = 0.3;
+    public static double jamCurrent = 8.0;
     public static double unjamPower = -0.75;
     public static double unjamDuration = 0.25;
     public static double pauseDuration = unjamDuration + 0.3;

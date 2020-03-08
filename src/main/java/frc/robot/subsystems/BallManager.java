@@ -11,12 +11,10 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -24,7 +22,7 @@ public class BallManager extends SubsystemBase {
 
   // Declare motors
   // public TalonSRX carouselMotor;
-  public VictorSPX carouselMotor;
+  public TalonSRX carouselMotor;
   public CANSparkMax feedMotor;
 
   /**
@@ -33,14 +31,14 @@ public class BallManager extends SubsystemBase {
   public BallManager() {
     // Initialize motors
     // carouselMotor = new TalonSRX(Constants.carouselID);
-    carouselMotor = new VictorSPX(Constants.carouselID);
+    carouselMotor = new TalonSRX(Constants.carouselID);
     feedMotor = new CANSparkMax(Constants.feedID, MotorType.kBrushless);
 
     // Configure motors
     carouselMotor.configFactoryDefault();
     feedMotor.restoreFactoryDefaults();
     // Set directions
-    carouselMotor.setInverted(false);
+    carouselMotor.setInverted(true);
     feedMotor.setInverted(false);
     // Set idle mode
     feedMotor.setIdleMode(IdleMode.kBrake);
@@ -48,8 +46,8 @@ public class BallManager extends SubsystemBase {
     carouselMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
     carouselMotor.setSensorPhase(true);
     // Config relevant frame periods to be at least as fast as periodic rate
-		// carouselMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, Constants.carouselPeriod);
-		// carouselMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, Constants.carouselPeriod);
+		carouselMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, Constants.carouselPeriod);
+		carouselMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, Constants.carouselPeriod);
     // Config peak and nominal outputs and enable brake
     carouselMotor.configNominalOutputForward(Constants.motorNominal);
     carouselMotor.configNominalOutputReverse(Constants.motorNominal);
@@ -65,13 +63,10 @@ public class BallManager extends SubsystemBase {
     // Config acceleration and cruise velocity
 		carouselMotor.configMotionCruiseVelocity(Constants.carouselCruiseVelocity);
     carouselMotor.configMotionAcceleration(Constants.carouselAcceleration);
-    
-    SmartDashboard.putNumber("Carousel Power", 0.0);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Carousel Voltage", carouselMotor.getBusVoltage());
   }
 }

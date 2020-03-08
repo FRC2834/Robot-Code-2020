@@ -42,19 +42,21 @@ public class AimTurret extends CommandBase {
     // Check if the target is detected
     if(SmartDashboard.getBoolean("Target Detected?", false)) {
       // Point the turret at the target 
-      double ticksToTarget = shooter.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0), Constants.turretTicksPerRevolution);
+      double ticksToTarget = shooter.getTurretYawTick(SmartDashboard.getNumber("turretYawError", 0.0) + (Math.PI / 90), Constants.turretTicksPerRevolution);
       double turretTargetTick = shooter.turretMotor.getSelectedSensorPosition() + ticksToTarget;
       if((ticksToTarget >= Constants.turretLowLimitTick) && (ticksToTarget <= Constants.turretHighLimitTick)) {
         shooter.turretMotor.set(ControlMode.MotionMagic, shooter.turretMotor.getSelectedSensorPosition() + ticksToTarget);
       }
       // Move the hood to the target angle
       double hoodAngleTicks = shooter.getHoodTargetTick(SmartDashboard.getNumber("hoodAngle (deg)", 45), Constants.hoodTicksPerRevolution);
+      // double hoodAngleTicks = shooter.getHoodTargetTick(SmartDashboard.getNumber("manualHoodAngle (deg)", 45), Constants.hoodTicksPerRevolution);
       shooter.hoodMotor.set(ControlMode.MotionMagic, hoodAngleTicks);
       // Set the velocity of the flywheel
       double shooterTicksPer100Ms = shooter.getShooterTicksPer100Ms(SmartDashboard.getNumber("targetRPM", 0.0), Constants.flywheelTicksPerRevolution);
-      if(Math.abs(ticksToTarget) < Constants.flywheelActivationThreshold) {
-        shooter.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
-      }
+      // double shooterTicksPer100Ms = shooter.getShooterTicksPer100Ms(SmartDashboard.getNumber("manualRPM", 0.0), Constants.flywheelTicksPerRevolution);
+      // if(Math.abs(ticksToTarget) < Constants.flywheelActivationThreshold) {
+      shooter.shooterMotor.set(ControlMode.Velocity, shooterTicksPer100Ms);
+      // }
 
       // Set tracking status to true
       SmartDashboard.putBoolean("Tracking?", true);

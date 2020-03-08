@@ -52,6 +52,8 @@ public class RobotContainer {
   // Buttons and Triggers
   JoystickButton intakeButton = new JoystickButton(buttonBox, Constants.intakeButton);
   JoystickButton outputButton = new JoystickButton(buttonBox, Constants.outputButton);
+  JoystickButton driverIntake = new JoystickButton(controller, Constants.driverIntake);
+  JoystickButton driverOutput = new JoystickButton(controller, Constants.driverOutput);
   JoystickButton aimBotButton = new  JoystickButton(buttonBox, Constants.aimBotButton);
   JoystickButton feedButton = new JoystickButton(buttonBox, Constants.feedButton);
   JoystickButton armButton = new JoystickButton(buttonBox, Constants.armButton);
@@ -66,7 +68,7 @@ public class RobotContainer {
     configureButtonBindings();
     driveTrain.setDefaultCommand(new Drive(driveTrain, controller));
     shooter.setDefaultCommand(new ManualTurret(shooter, controller));
-    ballManager.setDefaultCommand(new SpinCarousel(ballManager));
+    ballManager.setDefaultCommand(new SpinCarousel(ballManager, buttonBox));
   }
 
   /**
@@ -79,8 +81,14 @@ public class RobotContainer {
     intakeButton.whenPressed(new ControlIntake(intake, Constants.intakePower));
     intakeButton.whenReleased(new ControlIntake(intake, 0.0));
 
+    driverIntake.whenPressed(new ControlIntake(intake, Constants.intakePower));
+    driverIntake.whenReleased(new ControlIntake(intake, 0.0));
+
     outputButton.whenHeld(new ControlIntake(intake, Constants.outputPower));
-    outputButton.whenHeld(new ControlIntake(intake, 0.0));
+    outputButton.whenReleased(new ControlIntake(intake, 0.0));
+
+    driverOutput.whenHeld(new ControlIntake(intake, Constants.outputPower));
+    driverOutput.whenReleased(new ControlIntake(intake, 0.0));
 
     aimBotButton.whenHeld(new AimTurret(shooter, buttonBox));
     
