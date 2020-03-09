@@ -23,7 +23,6 @@ public class BallManager extends SubsystemBase {
   // Declare motors
   // public TalonSRX carouselMotor;
   public TalonSRX carouselMotor;
-  public CANSparkMax feedMotor;
 
   /**
    * Creates a new BallManager.
@@ -32,16 +31,10 @@ public class BallManager extends SubsystemBase {
     // Initialize motors
     // carouselMotor = new TalonSRX(Constants.carouselID);
     carouselMotor = new TalonSRX(Constants.carouselID);
-    feedMotor = new CANSparkMax(Constants.feedID, MotorType.kBrushless);
-
     // Configure motors
     carouselMotor.configFactoryDefault();
-    feedMotor.restoreFactoryDefaults();
     // Set directions
     carouselMotor.setInverted(true);
-    feedMotor.setInverted(false);
-    // Set idle mode
-    feedMotor.setIdleMode(IdleMode.kBrake);
     // Config absolute encoder
     carouselMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
     carouselMotor.setSensorPhase(true);

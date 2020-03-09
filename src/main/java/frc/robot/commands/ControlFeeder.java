@@ -8,21 +8,21 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.BallManager;
+import frc.robot.subsystems.Feeder;
 
 public class ControlFeeder extends CommandBase {
 
-  BallManager ballManager;
+  Feeder feeder;
   double power;
 
   /**
    * Creates a new ControlFeeder.
    */
-  public ControlFeeder(BallManager ballManager, double power) {
-    this.ballManager = ballManager;
+  public ControlFeeder(Feeder feeder, double power) {
+    this.feeder = feeder;
     this.power = power;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.ballManager);
+    addRequirements(this.feeder);
   }
 
   // Called when the command is initially scheduled.
@@ -33,7 +33,7 @@ public class ControlFeeder extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    ballManager.feedMotor.set(power);
+    feeder.feedMotor.set(power);
     end(false);
   }
 

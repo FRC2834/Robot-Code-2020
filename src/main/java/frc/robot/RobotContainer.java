@@ -24,6 +24,7 @@ import frc.robot.commands.ControlPneumatics.Solenoid;
 import frc.robot.subsystems.BallManager;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Pneumatics;
 import frc.robot.subsystems.Shooter;
@@ -42,6 +43,7 @@ public class RobotContainer {
   public final Shooter shooter = new Shooter();
   public final Intake intake = new Intake();
   public final BallManager ballManager = new BallManager();
+  public final Feeder feeder = new Feeder();
   public final Pneumatics pneumatics = new Pneumatics();
   public final Climber climber = new Climber();
 
@@ -92,8 +94,8 @@ public class RobotContainer {
 
     aimBotButton.whenHeld(new AimTurret(shooter, buttonBox));
     
-    feedButton.whenPressed(new ControlFeeder(ballManager, Constants.feedPower));
-    feedButton.whenReleased(new ControlFeeder(ballManager, Constants.feedNeutralPower));
+    feedButton.whenPressed(new ControlFeeder(feeder, Constants.feedPower));
+    feedButton.whenReleased(new ControlFeeder(feeder, Constants.feedNeutralPower));
 
     armButton.whenPressed(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kReverse));
     armButton.whenReleased(new ControlPneumatics(pneumatics, Solenoid.ARM_SOLENOID, Value.kForward));

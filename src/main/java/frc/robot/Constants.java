@@ -164,7 +164,7 @@ public interface Constants {
 
     // Ball manager parameters
     public static double carouselPower = 0.75;
-    public static double carouselShootPower = 0.3;
+    public static double carouselShootPower = 0.4;
     public static double jamCurrent = 8.0;
     public static double unjamPower = -0.75;
     public static double unjamDuration = 0.25;
