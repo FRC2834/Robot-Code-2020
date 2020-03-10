@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.autos.CenterAuto;
 import frc.robot.commands.AimTurret;
 import frc.robot.commands.Climb;
 import frc.robot.commands.ControlFeeder;
@@ -62,6 +65,9 @@ public class RobotContainer {
   JoystickButton climbUpButton = new JoystickButton(buttonBox, Constants.climberUpButton);
   JoystickButton climbDownButton = new JoystickButton(buttonBox, Constants.climberDownButton);
 
+  // Auto chooser
+  SendableChooser<Command> chooser = new SendableChooser<>();
+
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
@@ -70,7 +76,11 @@ public class RobotContainer {
     configureButtonBindings();
     driveTrain.setDefaultCommand(new Drive(driveTrain, controller));
     shooter.setDefaultCommand(new ManualTurret(shooter, controller));
-    ballManager.setDefaultCommand(new SpinCarousel(ballManager, buttonBox));
+    ballManager.setDefaultCommand(new SpinCarousel(ballManager, feeder));
+
+    // Add autos
+    chooser.addOption("Center Auto", new CenterAuto(shooter, feeder));
+    SmartDashboard.putData("Auto Mode", chooser);
   }
 
   /**
@@ -92,7 +102,7 @@ public class RobotContainer {
     driverOutput.whenHeld(new ControlIntake(intake, Constants.outputPower));
     driverOutput.whenReleased(new ControlIntake(intake, 0.0));
 
-    aimBotButton.whenHeld(new AimTurret(shooter, buttonBox));
+    aimBotButton.whenHeld(new AimTurret(shooter));
     
     feedButton.whenPressed(new ControlFeeder(feeder, Constants.feedPower));
     feedButton.whenReleased(new ControlFeeder(feeder, Constants.feedNeutralPower));
@@ -112,7 +122,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    Command m_autoCommand = new ControlIntake(intake, 0.5);
+    Command m_autoCommand = chooser.getSelected();
     return m_autoCommand;
   }
 }

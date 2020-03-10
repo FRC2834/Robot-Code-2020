@@ -9,7 +9,6 @@ package frc.robot.commands;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -18,15 +17,13 @@ import frc.robot.subsystems.Shooter;
 public class AimTurret extends CommandBase {
   // The subsystem the command runs on
   Shooter shooter;
-  Joystick buttonBox;
 
   /**
    * Creates a new AimTurret.
    * @param subsystem The subsystem used by this command.
    */
-  public AimTurret(Shooter shooter, Joystick buttonBox) {
+  public AimTurret(Shooter shooter) {
     this.shooter = shooter;
-    this.buttonBox = buttonBox;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.shooter);
   }
@@ -105,6 +102,10 @@ public class AimTurret extends CommandBase {
     shooter.shooterMotor.set(ControlMode.PercentOutput, 0.0);
     shooter.hoodMotor.set(ControlMode.PercentOutput, 0.0);
     shooter.turretMotor.set(ControlMode.PercentOutput, 0.0);
+
+    // Set tracking status to false
+    SmartDashboard.putBoolean("Tracking?", false);
+    SmartDashboard.putBoolean("Target Locked", false);
   }
 
   // Returns true when the command should end.

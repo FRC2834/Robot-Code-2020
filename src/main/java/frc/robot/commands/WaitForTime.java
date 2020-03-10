@@ -7,36 +7,36 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Feeder;
 
-public class ControlFeeder extends CommandBase {
+public class WaitForTime extends CommandBase {
 
-  Feeder feeder;
-  double power;
+  double duration;
+  double startTime;
   boolean isFinished;
 
   /**
-   * Creates a new ControlFeeder.
+   * Creates a new WaitForTime.
    */
-  public ControlFeeder(Feeder feeder, double power) {
-    this.feeder = feeder;
-    this.power = power;
+  public WaitForTime(double duration) {
+    this.duration = duration;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.feeder);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    startTime = Timer.getFPGATimestamp();
     isFinished = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    feeder.feedMotor.set(power);
-    isFinished = true;
+    if(Timer.getFPGATimestamp() - startTime >= duration) {
+      isFinished = true;
+    }
   }
 
   // Called once the command ends or is interrupted.

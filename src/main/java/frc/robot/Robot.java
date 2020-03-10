@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.autos.CenterAuto;
 import frc.robot.commands.ZeroHood;
 
 /**
@@ -75,14 +76,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = new CenterAuto(m_robotContainer.shooter, m_robotContainer.feeder);
+    m_autonomousCommand.schedule();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null && !hoodZeroed) {
-      zeroHoodCommand.andThen(m_autonomousCommand);
-      hoodZeroed = true;
-      // m_autonomousCommand.schedule();
-    }
+    // if (m_autonomousCommand != null && !hoodZeroed) {
+    //   zeroHoodCommand.andThen(m_autonomousCommand);
+    //   hoodZeroed = true;
+    //   // m_autonomousCommand.schedule();
+    // }
   }
 
   /**

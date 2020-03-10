@@ -7,23 +7,18 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Feeder;
 
-public class ControlFeeder extends CommandBase {
+public class WaitForLock extends CommandBase {
 
-  Feeder feeder;
-  double power;
   boolean isFinished;
 
   /**
-   * Creates a new ControlFeeder.
+   * Creates a new WaitForLock.
    */
-  public ControlFeeder(Feeder feeder, double power) {
-    this.feeder = feeder;
-    this.power = power;
+  public WaitForLock() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.feeder);
   }
 
   // Called when the command is initially scheduled.
@@ -35,8 +30,9 @@ public class ControlFeeder extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    feeder.feedMotor.set(power);
-    isFinished = true;
+    if(SmartDashboard.getBoolean("Target Locked", false)) {
+      isFinished = true;
+    }
   }
 
   // Called once the command ends or is interrupted.

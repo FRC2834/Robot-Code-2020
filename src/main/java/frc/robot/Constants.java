@@ -86,7 +86,7 @@ public interface Constants {
     public static double turretkI = 0.00031;
     public static double turretkD = 225 * turretkP;
     public static int turretCruiseVelocity = 2249;
-    public static int turretAcceleration = 2249 * 2;
+    public static int turretAcceleration = 2249 * 4;
 
     // Carousel motor config constants
     public static int carouselPeriod = 10;
@@ -127,7 +127,7 @@ public interface Constants {
     // Intake
     public static int intakeButton = 10;
     public static int driverIntake = 5;
-    public static double intakePower = 0.6;
+    public static double intakePower = 0.95;
     // Output
     public static int outputButton = 11;
     public static int driverOutput = 6;
@@ -183,4 +183,8 @@ public interface Constants {
     public static double climberTicksPerRevolution = 42.0;
     public static int climberHighTick = 4500;
     public static int climberLowTick = 0;
+
+    // Auto parameters
+    // Center auto
+    public static double feederDuration = 4.0;
 }
