@@ -50,6 +50,9 @@ public class RobotContainer {
   public final Pneumatics pneumatics = new Pneumatics();
   public final Climber climber = new Climber();
 
+  // NavX Gyro
+  
+
   // Controllers
   XboxController controller = new XboxController(0);
   Joystick buttonBox = new Joystick(1);
@@ -74,7 +77,6 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    driveTrain.setDefaultCommand(new Drive(driveTrain, controller));
     shooter.setDefaultCommand(new ManualTurret(shooter, controller));
     ballManager.setDefaultCommand(new SpinCarousel(ballManager, feeder));
 

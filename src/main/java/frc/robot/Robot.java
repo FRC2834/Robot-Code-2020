@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.autos.CenterAuto;
+import frc.robot.commands.Drive;
 import frc.robot.commands.ZeroHood;
 
 /**
@@ -113,6 +114,8 @@ public class Robot extends TimedRobot {
     m_robotContainer.pneumatics.ratchetSolenoid.set(false);
     m_robotContainer.climber.climberEncoderLeft.setPosition(0);
     m_robotContainer.climber.climberEncoderRight.setPosition(0);
+
+    m_robotContainer.driveTrain.setDefaultCommand(new Drive(m_robotContainer.driveTrain, m_robotContainer.controller));
   }
 
   /**

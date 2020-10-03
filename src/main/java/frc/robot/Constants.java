@@ -164,7 +164,7 @@ public interface Constants {
 
     // Ball manager parameters
     public static double carouselPower = 0.75;
-    public static double carouselShootPower = 0.4;
+    public static double carouselShootPower = 0.6;
     public static double jamCurrent = 8.0;
     public static double unjamPower = -0.75;
     public static double unjamDuration = 0.25;
@@ -187,4 +187,12 @@ public interface Constants {
     // Auto parameters
     // Center auto
     public static double feederDuration = 4.0;
+
+    // Robot Characterization
+    public static final double ksVolts = 0.245;
+    public static final double kvVoltSecondsPerMeter = 2.56;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.517;
+
+    // Example value only - as above, this must be tuned for your drive!
+    public static final double kPDriveVel = 8.5;
 }
