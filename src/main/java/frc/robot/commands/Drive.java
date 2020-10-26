@@ -39,15 +39,16 @@ public class Drive extends CommandBase {
     if(Math.abs(controller.getY(Hand.kLeft)) < 0.1) {
       power = 0.0;
     } else {
-      power = controller.getY(Hand.kLeft) * 0.5;
+      power = controller.getY(Hand.kLeft) * 1.0;
     }
 
     if(Math.abs(controller.getX(Hand.kRight)) < 0.1) {
       turn = 0.0;
     } else {
-      turn = controller.getX(Hand.kRight) * 0.5;
+      turn = controller.getX(Hand.kRight) * 1.0;
     }
     driveTrain.arcadeDrive(power, turn);
+    // driveTrain.drive.arcadeDrive(power, -turn);
     end(false);
   }
 

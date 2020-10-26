@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -117,8 +118,12 @@ public interface Constants {
     public static double hoodZeroAngle = 11 * (Math.PI / 180);
     public static double hoodZeroTicks = hoodZeroAngle * (hoodTicksPerRevolution / (2 * Math.PI));
 
+    // Drive train gear ratio
+    public static double driveTrainRatio = (84.0 / 10.0) * (26.0 / 22.0);
+
     // Drive ticks per revolution
     public static double driveTicksPerRevolution = 42;
+    public static double metersPerRevolution = (1 / driveTrainRatio) * (0.1524 * Math.PI);
 
     // Shooter speed multiplier
     public static double shooterVMultiplier = 1.0;
@@ -189,10 +194,21 @@ public interface Constants {
     public static double feederDuration = 4.0;
 
     // Robot Characterization
-    public static final double ksVolts = 0.245;
+    public static final double ksVolts = 0.225;
     public static final double kvVoltSecondsPerMeter = 2.56;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.517;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.497;
 
     // Example value only - as above, this must be tuned for your drive!
-    public static final double kPDriveVel = 8.5;
+    public static final double kPDriveVel = 0.0; // 22.9
+
+    public static final double kTrackwidthMeters = 0.72865;
+    public static final DifferentialDriveKinematics kDriveKinematics =
+        new DifferentialDriveKinematics(kTrackwidthMeters);
+
+    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 0.5;
+
+    // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
 }

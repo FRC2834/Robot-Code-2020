@@ -7,11 +7,19 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -25,6 +33,14 @@ public class DriveTrain extends SubsystemBase {
   public CANEncoder leftEncoder;
   // Declare the right encoder
   public CANEncoder rightEncoder;
+  // Declare differential drive
+  public DifferentialDrive drive;
+
+  // NavX Gyro
+  public AHRS gyro;
+
+  // Odometry class for tracking robot pose
+  public final DifferentialDriveOdometry m_odometry;
 
   /**
    * Creates a new DriveTrain.
@@ -45,10 +61,10 @@ public class DriveTrain extends SubsystemBase {
     rightDrive[0].restoreFactoryDefaults();
     rightDrive[1].restoreFactoryDefaults();
     // Set direction
-    leftDrive[0].setInverted(false);
-    leftDrive[1].setInverted(false);
-    rightDrive[0].setInverted(true);
-    rightDrive[1].setInverted(true);
+    leftDrive[0].setInverted(true);
+    // leftDrive[1].setInverted(false);
+    rightDrive[0].setInverted(false);
+    // rightDrive[1].setInverted(true);
     // Set idle mode
     leftDrive[0].setIdleMode(IdleMode.kBrake);
     leftDrive[1].setIdleMode(IdleMode.kBrake);
@@ -70,13 +86,62 @@ public class DriveTrain extends SubsystemBase {
     // Initialize encoders
     leftEncoder = new CANEncoder(leftDrive[0]);
     rightEncoder = new CANEncoder(rightDrive[0]);
-    leftEncoder.setPositionConversionFactor(Constants.driveTicksPerRevolution);
-    rightEncoder.setPositionConversionFactor(Constants.driveTicksPerRevolution);
+    leftEncoder.setPositionConversionFactor(Constants.metersPerRevolution);
+    rightEncoder.setPositionConversionFactor(Constants.metersPerRevolution);
+    leftEncoder.setVelocityConversionFactor(Constants.metersPerRevolution / 60); //rpm to meters per second
+    rightEncoder.setVelocityConversionFactor(Constants.metersPerRevolution / 60);
+
+    leftEncoder.setPosition(0.0);
+    rightEncoder.setPosition(0.0);
+
+    drive = new DifferentialDrive(leftDrive[0], rightDrive[0]);
+
+    // Gyro instantiation
+    gyro = new AHRS(Port.kMXP);
+    gyro.zeroYaw();
+
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // Update the odometry in the periodic block
+    m_odometry.update(Rotation2d.fromDegrees(getHeading()), leftEncoder.getPosition(),
+                      rightEncoder.getPosition());
+
+    SmartDashboard.putNumber("gyro heading", getHeading());
+    SmartDashboard.putNumber("gyro heading 2", gyro.getYaw());
+    SmartDashboard.putNumber("left pos", leftEncoder.getPosition());
+    SmartDashboard.putNumber("right pos", rightEncoder.getPosition());
+    SmartDashboard.putNumber("left vel", leftEncoder.getVelocity());
+    SmartDashboard.putNumber("right vel", rightEncoder.getVelocity());
+  }
+
+  /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity());
+  }
+
+  /**
+   * Returns the heading of the robot.
+   *
+   * @return the robot's heading in degrees, from -180 to 180
+   */
+  public double getHeading() {
+    return Math.IEEEremainder(-gyro.getYaw(), 360);
+  }
+
+  /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  public Pose2d getPose() {
+    return m_odometry.getPoseMeters();
   }
 
   /**
@@ -93,6 +158,18 @@ public class DriveTrain extends SubsystemBase {
   public void setPower(double left, double right) {
     leftDrive[0].set(left);
     rightDrive[0].set(right);
+  }
+
+  /**
+   * Controls the left and right sides of the drive directly with voltages.
+   *
+   * @param leftVolts  the commanded left output
+   * @param rightVolts the commanded right output
+   */
+  public void tankDriveVolts(double leftVolts, double rightVolts) {
+    leftDrive[0].setVoltage(leftVolts);
+    rightDrive[0].setVoltage(rightVolts);
+    drive.feed();
   }
 
   public void arcadeDrive(double power, double turn) {
@@ -121,6 +198,6 @@ public class DriveTrain extends SubsystemBase {
       rightPower = -(-Math.pow((Math.abs(rightPower) - 1), 2) + 1);
     }
 
-    setPower(leftPower, rightPower);
+    setVoltage(-leftPower*10, -rightPower*10);
   }
 }
